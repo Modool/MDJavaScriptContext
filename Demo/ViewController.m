@@ -13,6 +13,8 @@
 
 JSExportAs(set_test_message, - (void)setTestMessage:(NSString *)message);
 
+JSExportAs(set_test_multiple_parameter, - (void)setTestParameter1:(NSString *)parameter1 parameter2:(NSString *)parameter2);
+
 @end
 
 @interface TestExport : MDJSExport<TestExport>
@@ -29,11 +31,17 @@ JSExportAs(set_test_message, - (void)setTestMessage:(NSString *)message);
     
 }
 
+- (void)setTestParameter1:(NSString *)parameter1 parameter2:(NSString *)parameter2{
+    
+}
+
 @end
 
 @protocol TextImport <NSObject>
 
 MDJSImportMethodAs(set_import_message, - (void)setImportMessage:(NSString *)message);
+MDJSImportMethodAs(set_import_multiple_parameter, - (void)setImportParameter1:(int)parameter1 parameter2:(int)parameter2);
+
 MDJSImportPropertyAs(import_message, - (NSString *)importMessage);
 
 MDJSImportPropertyAs(import_closure, - (JSValue *)importClosure);
@@ -65,7 +73,7 @@ MDJSImportPropertyAs(import_closure, - (JSValue *)importClosure);
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.export = TestExport.new;
+    self.export = [[TestExport alloc] initWithName:@"test" type:MDJSExportInjectTypeAfterLoading];
     self.import = MDJSImportInstance(MDJSImport, TextImport);
     
     [self.webView.context addExport:self.export];
@@ -75,14 +83,16 @@ MDJSImportPropertyAs(import_closure, - (JSValue *)importClosure);
 }
 
 - (IBAction)didClickEvaluate:(id)sender{
-    id result = [self.import importMessage];
-    NSLog(@"%@", result);
+//    id result = [self.import importMessage];
+//    NSLog(@"%@", result);
+//
+//    [self.import setImportMessage:@"13242"];
+//
+//    JSValue *closure = [self.import importClosure];
+//
+//    [closure callWithArguments:@[@1, @2]];
     
-    [self.import setImportMessage:@"13242"];
-    
-    JSValue *closure = [self.import importClosure];
-    
-    [closure callWithArguments:@[@1, @2]];
+    [[self import] setImportParameter1:1 parameter2:2];
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType;{

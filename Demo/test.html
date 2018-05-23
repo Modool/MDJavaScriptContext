@@ -4,7 +4,8 @@
 
 <body>
     <p>this is a test page.</p>
-    <a href='https://www.baidu.com'>baidu</a>
+    <a href='javascript:test.set_test_message();'>test</a>
+    <a href='javascript:test.set_test_multiple_parameter(12,12);'>test multiple parameters</a>
 </body>
 
 <script>
@@ -27,5 +28,8 @@
         return function(a, b){
             alert("closure " + " " + a + " " + b)
         }
+    }
+    function set_import_multiple_parameter(arg1, arg2){
+        alert("set_import_multiple_parameter " + arg1 + " " + arg2)
     }
 </script>

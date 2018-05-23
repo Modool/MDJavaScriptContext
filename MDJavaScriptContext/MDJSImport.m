@@ -38,7 +38,7 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
                    *type == *@encode(long) ||
                    *type == *@encode(long long) ||
                    *type == *@encode(bool)) {
-            long long value;
+            long long value = 0;
             [invocation getArgument:&value atIndex:index];
             obj = [NSNumber numberWithLongLong:value];
         } else if (*type == *@encode(unsigned int) ||
@@ -46,7 +46,7 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
                    *type == *@encode(unsigned short) ||
                    *type == *@encode(unsigned long) ||
                    *type == *@encode(unsigned long long)) {
-            unsigned long long value;
+            unsigned long long value = 0;
             [invocation getArgument:&value atIndex:index];
             obj = [NSNumber numberWithLongLong:value];
         }
@@ -136,8 +136,7 @@ void *MDJSImportBoxReturnValue(const char *type, NSUInteger length, JSValue *val
 - (JSValue *)_forwardFunction:(NSString *)function invocation:(NSInvocation *)invocation{
     NSArray *arguments = MDJSImportBoxValues(invocation);
     JSValue *globalObject = self.javaScriptContext.globalObject;
-//    NSString *script = [function stringByAppendingFormat:@"(%@)", [arguments componentsJoinedByString:@","]];
-    
+
     return [globalObject invokeMethod:function withArguments:arguments];
 }
 
