@@ -29,8 +29,49 @@
     return [self initWithName:NSStringFromClass(self.class) type:MDJSExportInjectTypeAfterLoading];
 }
 
+#pragma mark - accessor
+
 - (NSString *)description{
     return [NSString stringWithFormat:@"<%@, %llu> name: %@, injectType: %lulu", self.class, (UInt64)self, _name, (unsigned long)_injectType];
+}
+
+#pragma mark - protected
+
++ (BOOL)instancesRespondToSelector:(SEL)aSelector;{
+    return [super instancesRespondToSelector:aSelector];
+}
++ (BOOL)conformsToProtocol:(Protocol *)protocol;{
+    return [super conformsToProtocol:protocol];
+}
+- (IMP)methodForSelector:(SEL)aSelector;{
+    return [super methodForSelector:aSelector];
+}
++ (IMP)instanceMethodForSelector:(SEL)aSelector;{
+    return [super instanceMethodForSelector:aSelector];
+}
+- (void)doesNotRecognizeSelector:(SEL)aSelector;{
+    [super doesNotRecognizeSelector:aSelector];
+}
+- (id)forwardingTargetForSelector:(SEL)aSelector;{
+    return [super forwardingTargetForSelector:aSelector];
+}
+- (void)forwardInvocation:(NSInvocation *)anInvocation{
+    [super forwardInvocation:anInvocation];
+}
++ (NSMethodSignature *)instanceMethodSignatureForSelector:(SEL)aSelector{
+    return [super instanceMethodSignatureForSelector:aSelector];
+}
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector{
+    return [super methodSignatureForSelector:aSelector];
+}
+- (BOOL)respondsToSelector:(SEL)aSelector{
+    return [super respondsToSelector:aSelector];
+}
++ (BOOL)resolveClassMethod:(SEL)sel{
+    return [super resolveClassMethod:sel];
+}
++ (BOOL)resolveInstanceMethod:(SEL)sel{
+    return [super resolveInstanceMethod:sel];
 }
 
 - (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{

@@ -46,6 +46,10 @@ MDJSExportAs(method_2_arg_1_arg_2, - (NSUInteger)method2WithArg:(NSString *)arg1
     return 5;
 }
 
+- (NSUInteger)method3{
+    return 6;
+}
+
 @end
 
 @interface MDJSExportTests : XCTestCase
