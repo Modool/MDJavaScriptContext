@@ -24,20 +24,22 @@
 
 - (void)awakeFromNib{
     [super awakeFromNib];
-    _context = [[MDJSContext alloc] initWithWebView:self];
-    _wrapper = [[MDJSWebViewDelegateWrapper alloc] initWithContext:_context];
     
-    super.delegate = _wrapper;
+    [self initialize];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
-        _context = [[MDJSContext alloc] initWithWebView:self];
-        _wrapper = [[MDJSWebViewDelegateWrapper alloc] initWithContext:_context];
-        
-        super.delegate = _wrapper;
+        [self initialize];
     }
     return self;
+}
+
+- (void)initialize{
+    _context = [[MDJSContext alloc] init];
+    _wrapper = [[MDJSWebViewDelegateWrapper alloc] initWithContext:_context];
+    
+    super.delegate = _wrapper;
 }
 
 - (void)setDelegate:(id<UIWebViewDelegate>)delegate{

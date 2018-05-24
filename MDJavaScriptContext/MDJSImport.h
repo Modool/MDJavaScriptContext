@@ -8,18 +8,21 @@
 
 #import "MDJSExport.h"
 
-#ifndef MDJSImportAs
-#define MDJSImportAs
+#ifndef __MDJSImportAs__
+#define __MDJSImportAs__
 
 #define MDJSImportInstance(CLASS, PROTOCOL)     [CLASS<PROTOCOL> importWithProtocol:@protocol(PROTOCOL)]
 
-#define MDJSImportMethodAs(PropertyName, Selector)  \
+#define MDJSImportAs(PropertyName, Selector)  \
 @optional Selector __MDJS_IMPORT_AS__##PropertyName:(id)argument; @optional Selector
 
 #define MDJSImportPropertyAs(PropertyName, Selector) \
 @optional Selector##__MDJS_IMPORT_AS__##PropertyName; @optional Selector
 
 #endif
+
+@protocol MDJSImport <NSObject>
+@end
 
 @interface MDJSImport : NSObject
 

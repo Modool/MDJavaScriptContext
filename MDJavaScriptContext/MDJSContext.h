@@ -13,11 +13,11 @@
 
 @property (nonatomic, strong, readonly) JSContext *javaScriptContext;
 
-@property (nonatomic, copy, readonly) NSArray<MDJSExport *> *exports;
+@property (nonatomic, copy, readonly) NSArray<MDJSExport<JSExport> *> *exports;
 @property (nonatomic, copy, readonly) NSArray<MDJSImport *> *imports;
 
-- (BOOL)addExport:(MDJSExport *)export_;
-- (BOOL)removeExport:(MDJSExport *)export_;
+- (BOOL)addExport:(MDJSExport<JSExport> *)export_;
+- (BOOL)removeExport:(MDJSExport<JSExport> *)export_;
 
 - (BOOL)addImport:(MDJSImport *)import;
 - (BOOL)removeImport:(MDJSImport *)import;

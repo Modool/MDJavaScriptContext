@@ -29,10 +29,23 @@
 		086710D820B3C03E00BC9967 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 086710D720B3C03E00BC9967 /* Assets.xcassets */; };
 		086710DB20B3C03E00BC9967 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 086710D920B3C03E00BC9967 /* LaunchScreen.storyboard */; };
 		086710DE20B3C03E00BC9967 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 086710DD20B3C03E00BC9967 /* main.m */; };
+		087196AA20B65AE000151EBD /* MDJSContextTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 087196A920B65AE000151EBD /* MDJSContextTests.m */; };
+		087196AC20B65AE000151EBD /* MDJavaScriptContext.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867109C20B2C81800BC9967 /* MDJavaScriptContext.framework */; };
+		087196B320B65BC200151EBD /* MDJSWebViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 087196B220B65BC200151EBD /* MDJSWebViewTests.m */; };
+		087196B720B6676700151EBD /* MDJSExportTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 087196B620B6676700151EBD /* MDJSExportTests.m */; };
+		087196B920B6678F00151EBD /* MDJSImportTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 087196B820B6678F00151EBD /* MDJSImportTests.m */; };
+		087196BB20B675A400151EBD /* test.js in Resources */ = {isa = PBXBuildFile; fileRef = 087196BA20B675A400151EBD /* test.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		0825517820B3C3F800A272AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867109320B2C81800BC9967 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0867109B20B2C81800BC9967;
+			remoteInfo = MDJavaScriptContext;
+		};
+		087196AD20B65AE000151EBD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867109320B2C81800BC9967 /* Project object */;
 			proxyType = 1;
@@ -70,6 +83,13 @@
 		086710DA20B3C03E00BC9967 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		086710DC20B3C03E00BC9967 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		086710DD20B3C03E00BC9967 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		087196A720B65AE000151EBD /* MDJavaScriptContextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MDJavaScriptContextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		087196A920B65AE000151EBD /* MDJSContextTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSContextTests.m; sourceTree = "<group>"; };
+		087196AB20B65AE000151EBD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		087196B220B65BC200151EBD /* MDJSWebViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSWebViewTests.m; sourceTree = "<group>"; };
+		087196B620B6676700151EBD /* MDJSExportTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSExportTests.m; sourceTree = "<group>"; };
+		087196B820B6678F00151EBD /* MDJSImportTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSImportTests.m; sourceTree = "<group>"; };
+		087196BA20B675A400151EBD /* test.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = test.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +108,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		087196A420B65AE000151EBD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				087196AC20B65AE000151EBD /* MDJavaScriptContext.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -96,6 +124,7 @@
 			children = (
 				0867109E20B2C81800BC9967 /* MDJavaScriptContext */,
 				086710CD20B3C03C00BC9967 /* Demo */,
+				087196A820B65AE000151EBD /* MDJavaScriptContextTests */,
 				0867109D20B2C81800BC9967 /* Products */,
 				086710B720B2C8C500BC9967 /* Frameworks */,
 			);
@@ -106,6 +135,7 @@
 			children = (
 				0867109C20B2C81800BC9967 /* MDJavaScriptContext.framework */,
 				086710CC20B3C03C00BC9967 /* Demo.app */,
+				087196A720B65AE000151EBD /* MDJavaScriptContextTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,6 +185,19 @@
 				086710DD20B3C03E00BC9967 /* main.m */,
 			);
 			path = Demo;
+			sourceTree = "<group>";
+		};
+		087196A820B65AE000151EBD /* MDJavaScriptContextTests */ = {
+			isa = PBXGroup;
+			children = (
+				087196BA20B675A400151EBD /* test.js */,
+				087196B620B6676700151EBD /* MDJSExportTests.m */,
+				087196B820B6678F00151EBD /* MDJSImportTests.m */,
+				087196B220B65BC200151EBD /* MDJSWebViewTests.m */,
+				087196A920B65AE000151EBD /* MDJSContextTests.m */,
+				087196AB20B65AE000151EBD /* Info.plist */,
+			);
+			path = MDJavaScriptContextTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -215,6 +258,24 @@
 			productReference = 086710CC20B3C03C00BC9967 /* Demo.app */;
 			productType = "com.apple.product-type.application";
 		};
+		087196A620B65AE000151EBD /* MDJavaScriptContextTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 087196B120B65AE000151EBD /* Build configuration list for PBXNativeTarget "MDJavaScriptContextTests" */;
+			buildPhases = (
+				087196A320B65AE000151EBD /* Sources */,
+				087196A420B65AE000151EBD /* Frameworks */,
+				087196A520B65AE000151EBD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				087196AE20B65AE000151EBD /* PBXTargetDependency */,
+			);
+			name = MDJavaScriptContextTests;
+			productName = MDJavaScriptContextTests;
+			productReference = 087196A720B65AE000151EBD /* MDJavaScriptContextTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -228,6 +289,9 @@
 						CreatedOnToolsVersion = 9.3.1;
 					};
 					086710CB20B3C03C00BC9967 = {
+						CreatedOnToolsVersion = 9.3.1;
+					};
+					087196A620B65AE000151EBD = {
 						CreatedOnToolsVersion = 9.3.1;
 					};
 				};
@@ -247,6 +311,7 @@
 			targets = (
 				0867109B20B2C81800BC9967 /* MDJavaScriptContext */,
 				086710CB20B3C03C00BC9967 /* Demo */,
+				087196A620B65AE000151EBD /* MDJavaScriptContextTests */,
 			);
 		};
 /* End PBXProject section */
@@ -267,6 +332,14 @@
 				086710DB20B3C03E00BC9967 /* LaunchScreen.storyboard in Resources */,
 				086710D820B3C03E00BC9967 /* Assets.xcassets in Resources */,
 				086710D620B3C03C00BC9967 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		087196A520B65AE000151EBD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				087196BB20B675A400151EBD /* test.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +368,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		087196A320B65AE000151EBD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				087196B920B6678F00151EBD /* MDJSImportTests.m in Sources */,
+				087196AA20B65AE000151EBD /* MDJSContextTests.m in Sources */,
+				087196B720B6676700151EBD /* MDJSExportTests.m in Sources */,
+				087196B320B65BC200151EBD /* MDJSWebViewTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -302,6 +386,11 @@
 			isa = PBXTargetDependency;
 			target = 0867109B20B2C81800BC9967 /* MDJavaScriptContext */;
 			targetProxy = 0825517820B3C3F800A272AE /* PBXContainerItemProxy */;
+		};
+		087196AE20B65AE000151EBD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0867109B20B2C81800BC9967 /* MDJavaScriptContext */;
+			targetProxy = 087196AD20B65AE000151EBD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -523,6 +612,38 @@
 			};
 			name = Release;
 		};
+		087196AF20B65AE000151EBD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = MDJavaScriptContextTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.markejave.MDJavaScriptContextTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		087196B020B65AE000151EBD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = MDJavaScriptContextTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.markejave.MDJavaScriptContextTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -549,6 +670,15 @@
 			buildConfigurations = (
 				086710E020B3C03E00BC9967 /* Debug */,
 				086710E120B3C03E00BC9967 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		087196B120B65AE000151EBD /* Build configuration list for PBXNativeTarget "MDJavaScriptContextTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				087196AF20B65AE000151EBD /* Debug */,
+				087196B020B65AE000151EBD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -8,7 +8,8 @@
 
 #import <JavaScriptCore/JavaScriptCore.h>
 
-#ifndef MDJSExportAs
+#ifndef __MDJSExportAs__
+#define __MDJSExportAs__
 #define MDJSExportAs    JSExportAs
 #endif
 

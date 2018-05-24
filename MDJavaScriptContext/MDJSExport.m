@@ -29,6 +29,10 @@
     return [self initWithName:NSStringFromClass(self.class) type:MDJSExportInjectTypeAfterLoading];
 }
 
+- (NSString *)description{
+    return [NSString stringWithFormat:@"<%@, %llu> name: %@, injectType: %lulu", self.class, (UInt64)self, _name, (unsigned long)_injectType];
+}
+
 - (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{
     self.javaScriptContext = context;
 }

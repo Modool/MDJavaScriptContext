@@ -55,36 +55,6 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
     return values;
 }
 
-void *MDJSImportBoxReturnValue(const char *type, NSUInteger length, JSValue *value){
-    void *result = *type == 'v' ? NULL : (__bridge void *)value;
-    
-    if (*type == '@') {
-        if ([value isUndefined] || [value isNull]) {
-            result = NULL;
-        } else if (!JSObjectIsFunction(value.context.JSGlobalContextRef, (JSObjectRef)value.JSValueRef)) {
-            if ([value isString]) result = (__bridge void *)[value toString];
-            else if ([value isObject]) result = (__bridge void *)[value toObject];
-        }
-    } else if (*type == '{' ||
-               *type == *@encode(double) || *type == *@encode(float) ||
-               *type == *@encode(int) || *type == *@encode(unsigned int) ||
-               *type == *@encode(char) || *type == *@encode(unsigned char) ||
-               *type == *@encode(short) || *type == *@encode(unsigned short) ||
-               *type == *@encode(long) || *type == *@encode(unsigned long) ||
-               *type == *@encode(long long) || *type == *@encode(unsigned long long) ||
-               *type == *@encode(bool)) {
-        id obj = [value toObject];
-        if ([obj isKindOfClass:NSValue.class]) {
-            if (@available(iOS 11, *)) {
-                [obj getValue:&result size:length];
-            } else {
-                [obj getValue:&result];
-            }
-        }
-    }
-    return result;
-}
-
 @implementation MDJSImport
 
 + (instancetype)importWithProtocol:(Protocol *)protocol;{
@@ -93,6 +63,8 @@ void *MDJSImportBoxReturnValue(const char *type, NSUInteger length, JSValue *val
 
 - (instancetype)initWithProtocol:(Protocol *)protocol;{
     NSParameterAssert(protocol);
+    NSParameterAssert(protocol_conformsToProtocol(protocol, @protocol(MDJSImport)));
+    
     if (self = [super init]) {
         _protocol = protocol;
     }
@@ -106,12 +78,24 @@ void *MDJSImportBoxReturnValue(const char *type, NSUInteger length, JSValue *val
 #pragma mark - private
 
 - (NSString *)_functionForSelector:(SEL)selector{
+    NSString *functionName = [self functionNameWithSelector:selector required:NO];
+
+    if (!functionName.length) {
+        functionName = [self functionNameWithSelector:selector required:YES];
+    }
+    if (!functionName.length) {
+        functionName = [self defaultFunctionNameFromSelectorName:NSStringFromSelector(selector)];
+    }
+    return functionName;
+}
+
+- (NSString *)functionNameWithSelector:(SEL)selector required:(BOOL)required{
     NSString *selectorName = NSStringFromSelector(selector);
     BOOL isGetter = ![selectorName containsString:@":"];
     
     NSString *functionName = nil;
     unsigned int count = 0;
-    objc_method_description_t *descriptions = protocol_copyMethodDescriptionList(_protocol, NO, YES, &count);
+    objc_method_description_t *descriptions = protocol_copyMethodDescriptionList(_protocol, required, YES, &count);
     
     for (int index = 0; index < count; index++) {
         objc_method_description_t description = descriptions[index];
@@ -126,11 +110,25 @@ void *MDJSImportBoxReturnValue(const char *type, NSUInteger length, JSValue *val
         functionName = [methodSelectorName substringWithRange:NSMakeRange(location, methodSelectorName.length - location - !isGetter)];
         break;
     }
-    if (!functionName.length) {
-        if (isGetter) functionName = selectorName;
-        else functionName = [[selectorName substringToIndex:selectorName.length - 2] stringByReplacingOccurrencesOfString:@":" withString:@"_"];
-    }
     return functionName;
+}
+
+- (NSString *)defaultFunctionNameFromSelectorName:(NSString *)selectorName{
+    BOOL isGetter = ![selectorName containsString:@":"];
+    if (isGetter) return selectorName;
+    
+    NSMutableString *result = [NSMutableString string];
+    NSArray<NSString *> *labels = [selectorName componentsSeparatedByString:@":"];
+    for (int index = 0; index < labels.count; index++) {
+        NSString *label = labels[index];
+        if (!label.length) continue;
+        if (index) {
+            NSString *firstCharacter = [[label substringToIndex:1] uppercaseString];
+            label = [label stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:firstCharacter];
+        }
+        [result appendString:label];
+    }
+    return result.copy;
 }
 
 - (JSValue *)_forwardFunction:(NSString *)function invocation:(NSInvocation *)invocation{
@@ -140,14 +138,75 @@ void *MDJSImportBoxReturnValue(const char *type, NSUInteger length, JSValue *val
     return [globalObject invokeMethod:function withArguments:arguments];
 }
 
-- (void)_invokeInvocation:(NSInvocation *)invocation returnValue:(JSValue *)returnValue{
+- (void)_invokeInvocation:(NSInvocation *)invocation value:(JSValue *)value{
     const char *type = invocation.methodSignature.methodReturnType;
     NSUInteger length = invocation.methodSignature.methodReturnLength;
-    void *value = MDJSImportBoxReturnValue(type, length, returnValue);
-    if (value) [invocation setReturnValue:&value];
+    
+    if (*type == '@') {
+        if (![value isUndefined] && ![value isNull] && !JSObjectIsFunction(value.context.JSGlobalContextRef, (JSObjectRef)value.JSValueRef)) {
+            if ([value isString]) {
+                NSString *string = [value toString];
+                [invocation setReturnValue:&string];
+            } else if ([value isObject]) {
+                id object = [value toObject];
+                [invocation setReturnValue:&object];
+            }
+        }
+    } else if (*type == '{'){
+        id obj = [value toObject];
+        if ([obj isKindOfClass:NSValue.class]) {
+            void *structValue = NULL;
+            if (@available(iOS 11, *)) {
+                [obj getValue:&structValue size:length];
+            } else {
+                [obj getValue:&structValue];
+            }
+            [invocation setReturnValue:&structValue];
+        } else {
+            [invocation setReturnValue:&obj];
+        }
+    } else if (*type == *@encode(int) ||
+               *type == *@encode(char) ||
+               *type == *@encode(short) ||
+               *type == *@encode(long) ||
+               *type == *@encode(long long) ||
+               *type == *@encode(bool)) {
+        
+        long long longLongValue = [[value toNumber] longLongValue];
+        [invocation setReturnValue:&longLongValue];
+    } else if (*type == *@encode(unsigned int) ||
+               *type == *@encode(unsigned char) ||
+               *type == *@encode(unsigned short) ||
+               *type == *@encode(unsigned long) ||
+               *type == *@encode(unsigned long long)) {
+        
+        unsigned long long unsignedLongLongValue = [[value toNumber] unsignedLongLongValue];
+        [invocation setReturnValue:&unsignedLongLongValue];
+    } else if (*type == *@encode(double) || *type == *@encode(float)) {
+        
+        double doubleValue = [[value toNumber] doubleValue];
+        [invocation setReturnValue:&doubleValue];
+    } else if (*type != 'v') {
+        [invocation setReturnValue:&value];
+    }
     
     invocation.target = nil;
     [invocation invoke];
+}
+
+- (BOOL)methodDescriptionForSelector:(SEL)selector description:(objc_method_description_t *)description{
+    objc_method_description_t desc = protocol_getMethodDescription(_protocol, selector, NO, YES);
+    if (desc.name && desc.types) {
+        *description = desc;
+        return YES;
+    }
+    desc = protocol_getMethodDescription(_protocol, selector, YES, YES);
+    if (desc.name && desc.types) {
+        *description = desc;
+        return YES;
+    }
+    
+    return NO;
 }
 
 #pragma mark - protected
@@ -156,16 +215,16 @@ void *MDJSImportBoxReturnValue(const char *type, NSUInteger length, JSValue *val
     NSString *functionName = [self _functionForSelector:anInvocation.selector];
     if (functionName.length) {
         JSValue *value = [self _forwardFunction:functionName invocation:anInvocation];
-        [self _invokeInvocation:anInvocation returnValue:value];
+        [self _invokeInvocation:anInvocation value:value];
     } else {
         [super forwardInvocation:anInvocation];
     }
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector{
-    struct objc_method_description description = protocol_getMethodDescription(_protocol, aSelector, NO, YES);
+    objc_method_description_t description;
     
-    if (description.name && description.types) {
+    if ([self methodDescriptionForSelector:aSelector description:&description]) {
         return [NSMethodSignature signatureWithObjCTypes:description.types];
     }
     return [super methodSignatureForSelector:aSelector];

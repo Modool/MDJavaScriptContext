@@ -11,7 +11,7 @@
 @interface MDJSExport ()
 
 @property (nonatomic, strong) NSString *name;
-@property (nonatomic, strong) JSContext *javaScriptContext;
+@property (nonatomic, weak) JSContext *javaScriptContext;
 
 - (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;
 - (void)didInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;

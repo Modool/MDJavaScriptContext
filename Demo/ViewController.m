@@ -11,9 +11,9 @@
 
 @protocol TestExport <JSExport>
 
-JSExportAs(set_test_message, - (void)setTestMessage:(NSString *)message);
+MDJSExportAs(set_test_message, - (void)setTestMessage:(NSString *)message);
 
-JSExportAs(set_test_multiple_parameter, - (void)setTestParameter1:(NSString *)parameter1 parameter2:(NSString *)parameter2);
+MDJSExportAs(set_test_multiple_parameter, - (void)setTestParameter1:(NSString *)parameter1 parameter2:(NSString *)parameter2);
 
 @end
 
@@ -39,8 +39,8 @@ JSExportAs(set_test_multiple_parameter, - (void)setTestParameter1:(NSString *)pa
 
 @protocol TextImport <NSObject>
 
-MDJSImportMethodAs(set_import_message, - (void)setImportMessage:(NSString *)message);
-MDJSImportMethodAs(set_import_multiple_parameter, - (void)setImportParameter1:(int)parameter1 parameter2:(int)parameter2);
+MDJSImportAs(set_import_message, - (void)setImportMessage:(NSString *)message);
+MDJSImportAs(set_import_multiple_parameter, - (void)setImportParameter1:(int)parameter1 parameter2:(int)parameter2);
 
 MDJSImportPropertyAs(import_message, - (NSString *)importMessage);
 

@@ -14,13 +14,6 @@
 
 @implementation MDJSContext
 
-- (instancetype)initWithWebView:(UIWebView *)webView;{
-    if (self = [self init]) {
-        _webView = webView;
-    }
-    return self;
-}
-
 - (instancetype)init{
     if (self = [super init]) {;
         _mutableExports = NSMutableDictionary.dictionary;
@@ -31,12 +24,8 @@
 
 #pragma mark - accessor
 
-- (JSContext *)javaScriptContext{
-    return _webView.javaScriptContext;
-}
-
-- (NSArray<MDJSExport *> *)exports{
-    return _mutableExports.copy;
+- (NSArray<MDJSExport<JSExport> *> *)exports{
+    return _mutableExports.allValues;
 }
 
 - (NSArray<MDJSImport *> *)imports{
@@ -45,7 +34,9 @@
 
 #pragma mark - public
 
-- (BOOL)addExport:(MDJSExport *)export_;{
+- (BOOL)addExport:(MDJSExport<JSExport> *)export_;{
+    NSParameterAssert([export_ conformsToProtocol:@protocol(JSExport)]);
+    
     if ([_mutableExports.allKeys containsObject:export_.name]) return NO;
     if ([_mutableExports.allValues containsObject:export_]) return NO;
     
@@ -53,7 +44,7 @@
     return YES;
 }
 
-- (BOOL)removeExport:(MDJSExport *)export_;{
+- (BOOL)removeExport:(MDJSExport<JSExport> *)export_;{
     if (![_mutableExports.allKeys containsObject:export_.name]) return NO;
     
     [_mutableExports removeObjectForKey:export_.name];
@@ -104,12 +95,14 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView;{
     JSContext *context = webView.javaScriptContext;
+    self.javaScriptContext = context;
     
     [self _injectExportsForContext:context type:MDJSExportInjectTypeBeforeLoading];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView;{
     JSContext *context = webView.javaScriptContext;
+    self.javaScriptContext = context;
     
     [self _injectExportsForContext:context type:MDJSExportInjectTypeAfterLoading];
     [self _injectImportsForContext:context];

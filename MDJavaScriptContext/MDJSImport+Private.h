@@ -10,6 +10,6 @@
 
 @interface MDJSImport ()
 
-@property (nonatomic, strong) JSContext *javaScriptContext;
+@property (nonatomic, weak) JSContext *javaScriptContext;
 
 @end
