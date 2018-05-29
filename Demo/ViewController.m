@@ -74,7 +74,7 @@ MDJSImportPropertyAs(import_closure, - (JSValue *)importClosure);
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     self.export = [[TestExport alloc] initWithName:@"test" type:MDJSExportInjectTypeAfterLoading];
-    self.import = MDJSImportInstance(MDJSImport, TextImport);
+    self.import = MDJSImportAlloc(MDJSImport, TextImport);
     
     [self.webView.context addExport:self.export];
     [self.webView.context addImport:self.import];

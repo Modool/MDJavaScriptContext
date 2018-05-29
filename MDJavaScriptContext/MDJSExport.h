@@ -14,11 +14,12 @@
 #endif
 
 typedef NS_ENUM(NSUInteger, MDJSExportInjectType) {
-    MDJSExportInjectTypeBeforeLoading   = 1 << 0,
-    MDJSExportInjectTypeAfterLoading    = 1 << 1,
+    MDJSExportInjectTypeInitializing    = 1 << 0,
+    MDJSExportInjectTypeStartLoading   = 1 << 1,
+    MDJSExportInjectTypeAfterLoading    = 1 << 2,
     
     MDJSExportInjectTypeNone   = 0,
-    MDJSExportInjectTypeAll    = MDJSExportInjectTypeBeforeLoading | MDJSExportInjectTypeAfterLoading,
+    MDJSExportInjectTypeAll    = MDJSExportInjectTypeInitializing | MDJSExportInjectTypeStartLoading | MDJSExportInjectTypeAfterLoading,
 };
 
 @interface MDJSExport : NSObject

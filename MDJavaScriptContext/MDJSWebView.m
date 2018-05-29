@@ -36,7 +36,7 @@
 }
 
 - (void)initialize{
-    _context = [[MDJSContext alloc] init];
+    _context = [[MDJSContext alloc] initWithWebView:self];
     _wrapper = [[MDJSWebViewDelegateWrapper alloc] initWithContext:_context];
     
     super.delegate = _wrapper;
