@@ -22,7 +22,7 @@
 - (void)_injectExportsForContext:(JSContext *)context type:(MDJSExportInjectType)type;
 - (void)_removeExport:(MDJSExport *)export inContext:(JSContext *)context;
 
-- (void)_injectImportsForContext:(JSContext *)context;
+- (void)_injectImportsForContext:(JSContext *)context type:(MDJSExportInjectType)type;
 
 @end
 

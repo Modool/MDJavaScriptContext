@@ -10,7 +10,7 @@
 #import "MDJSContext+Private.h"
 
 #import "MDJSExport+Private.h"
-#import "MDJSImport.h"
+#import "MDJSImport+Private.h"
 
 @implementation MDJSContext
 
@@ -46,23 +46,26 @@
 
 - (BOOL)removeExport:(MDJSExport<JSExport> *)export_;{
     if (![_mutableExports.allKeys containsObject:export_.name]) return NO;
-    
     [_mutableExports removeObjectForKey:export_.name];
+    
     [self _removeExport:export_ inContext:self.javaScriptContext];
+    
     return YES;
 }
 
 - (BOOL)addImport:(MDJSImport *)import;{
     if ([_mutableImports containsObject:import]) return NO;
-    
     [_mutableImports addObject:import];
+    
     return YES;
 }
 
 - (BOOL)removeImport:(MDJSImport *)import;{
     if (![_mutableImports containsObject:import]) return NO;
-    
     [_mutableImports removeObject:import];
+    
+    [self _removeImport:import inContext:self.javaScriptContext];
+    
     return YES;
 }
 
@@ -75,20 +78,38 @@
 
         if (!(export.injectType & type)) continue;
         
+        export.javaScriptContext = context;
         [export willInjectToContext:context type:type];
-        
-        context[export.name] = export;
-        
+        [export injectExportForContext:context type:type];
         [export didInjectToContext:context type:type];
     }
 }
 
 - (void)_removeExport:(MDJSExport *)export inContext:(JSContext *)context{
-    context[export.name] = nil;
+    [export willRemoveFromContext:context];
+    [export removeFromContext:context];
+    [export didRemoveFromContext:context];
+    
+    export.javaScriptContext = nil;
 }
 
-- (void)_injectImportsForContext:(JSContext *)context{
-    [_mutableImports setValue:context forKey:@"javaScriptContext"];
+- (void)_injectImportsForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+    for (MDJSImport *import in _mutableImports.copy) {
+        if (!(import.injectType & type)) continue;
+        
+        import.javaScriptContext = context;
+        [import willInjectToContext:context type:type];
+        [import injectExportForContext:context type:type];
+        [import didInjectToContext:context type:type];
+    }
+}
+
+- (void)_removeImport:(MDJSImport *)import inContext:(JSContext *)context{
+    [import willRemoveFromContext:context];
+    [import removeFromContext:context];
+    [import didRemoveFromContext:context];
+    
+    import.javaScriptContext = nil;
 }
 
 #pragma mark - UIWebViewDelegate
@@ -98,6 +119,7 @@
     self.javaScriptContext = context;
     
     [self _injectExportsForContext:context type:MDJSExportInjectTypeBeforeLoading];
+    [self _injectImportsForContext:context type:MDJSExportInjectTypeBeforeLoading];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView;{
@@ -105,7 +127,7 @@
     self.javaScriptContext = context;
     
     [self _injectExportsForContext:context type:MDJSExportInjectTypeAfterLoading];
-    [self _injectImportsForContext:context];
+    [self _injectImportsForContext:context type:MDJSExportInjectTypeAfterLoading];
 }
 
 @end

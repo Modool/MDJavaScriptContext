@@ -57,39 +57,40 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 
 @implementation MDJSImport
 
-+ (instancetype)importWithProtocol:(Protocol *)protocol;{
-    return [[self alloc] initWithProtocol:protocol];
++ (instancetype)importWithProtocol:(Protocol *)protocol type:(MDJSExportInjectType)type;{
+    return [[self alloc] initWithProtocol:protocol type:type];
 }
 
-- (instancetype)initWithProtocol:(Protocol *)protocol;{
+- (instancetype)initWithProtocol:(Protocol *)protocol type:(MDJSExportInjectType)type;{
     NSParameterAssert(protocol);
     NSParameterAssert(protocol_conformsToProtocol(protocol, @protocol(MDJSImport)));
     
     if (self = [super init]) {
         _protocol = protocol;
+        _injectType = type;
     }
     return self;
 }
 
 - (instancetype)init{
-    return [self initWithProtocol:nil];
+    return [self initWithProtocol:nil type:0];
 }
 
 #pragma mark - private
 
 - (NSString *)_functionForSelector:(SEL)selector{
-    NSString *functionName = [self functionNameWithSelector:selector required:NO];
+    NSString *functionName = [self _functionNameWithSelector:selector required:NO];
 
     if (!functionName.length) {
-        functionName = [self functionNameWithSelector:selector required:YES];
+        functionName = [self _functionNameWithSelector:selector required:YES];
     }
     if (!functionName.length) {
-        functionName = [self defaultFunctionNameFromSelectorName:NSStringFromSelector(selector)];
+        functionName = [self _defaultFunctionNameFromSelectorName:NSStringFromSelector(selector)];
     }
     return functionName;
 }
 
-- (NSString *)functionNameWithSelector:(SEL)selector required:(BOOL)required{
+- (NSString *)_functionNameWithSelector:(SEL)selector required:(BOOL)required{
     NSString *selectorName = NSStringFromSelector(selector);
     BOOL isGetter = ![selectorName containsString:@":"];
     
@@ -113,7 +114,7 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
     return functionName;
 }
 
-- (NSString *)defaultFunctionNameFromSelectorName:(NSString *)selectorName{
+- (NSString *)_defaultFunctionNameFromSelectorName:(NSString *)selectorName{
     BOOL isGetter = ![selectorName containsString:@":"];
     if (isGetter) return selectorName;
     
@@ -194,7 +195,7 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
     [invocation invoke];
 }
 
-- (BOOL)methodDescriptionForSelector:(SEL)selector description:(objc_method_description_t *)description{
+- (BOOL)_methodDescriptionForSelector:(SEL)selector description:(objc_method_description_t *)description{
     objc_method_description_t desc = protocol_getMethodDescription(_protocol, selector, NO, YES);
     if (desc.name && desc.types) {
         *description = desc;
@@ -224,10 +225,28 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector{
     objc_method_description_t description;
     
-    if ([self methodDescriptionForSelector:aSelector description:&description]) {
+    if ([self _methodDescriptionForSelector:aSelector description:&description]) {
         return [NSMethodSignature signatureWithObjCTypes:description.types];
     }
     return [super methodSignatureForSelector:aSelector];
+}
+
+- (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{
+}
+
+- (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+}
+
+- (void)didInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{
+}
+
+- (void)willRemoveFromContext:(JSContext *)context;{
+}
+
+- (void)removeFromContext:(JSContext *)context{
+}
+
+- (void)didRemoveFromContext:(JSContext *)context;{
 }
 
 @end

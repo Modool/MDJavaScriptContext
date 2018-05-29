@@ -33,7 +33,7 @@ MDJSImportAs(function5, - (NSUInteger)function5WithArg:(NSString *)arg1 arg2:(NS
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
     _context = [[JSContext alloc] init];
-    _import = MDJSImportInstance(MDJSImport, MDJSImportTestsImport);
+    _import = MDJSImportAlloc(MDJSImport, MDJSImportTestsImport);
     _import.javaScriptContext = _context;
     
     NSBundle *bundle = [NSBundle bundleForClass:self.class];

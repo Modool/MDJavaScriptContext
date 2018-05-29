@@ -56,6 +56,7 @@ MDJSExportAs(method_2_arg_1_arg_2, - (NSUInteger)method2WithArg:(NSString *)arg1
 
 @property (nonatomic, strong, readonly) JSContext *context;
 @property (nonatomic, strong, readonly) MDJSExportTestsExport *export;
+@property (nonatomic, strong, readonly) MDJSExportTestsExport *subExport;
 
 @end
 
@@ -67,20 +68,26 @@ MDJSExportAs(method_2_arg_1_arg_2, - (NSUInteger)method2WithArg:(NSString *)arg1
     
     _context = [[JSContext alloc] init];
     _export = [[MDJSExportTestsExport alloc] initWithName:@"_export" type:MDJSExportInjectTypeAfterLoading];
-
-    _context[_export.name] = _export;
+    
+    _subExport = [[MDJSExportTestsExport alloc] initWithName:@"_sub_export" type:MDJSExportInjectTypeAfterLoading];
+    [_export addSubExport:_subExport];
+    
+    [_export injectExportForContext:_context type:MDJSExportInjectTypeAfterLoading];
     
     JSValue *value = [_context evaluateScript:@"_export"];
+    XCTAssertTrue([value.toObject isKindOfClass:MDJSExportTestsExport.class]);
+    
+    value = [_context evaluateScript:@"_export._sub_export"];
     XCTAssertTrue([value.toObject isKindOfClass:MDJSExportTestsExport.class]);
 }
 
 - (void)test_method1 {
-    JSValue *value = [_context evaluateScript:@"_export.method1()"];
+    JSValue *value = [_context evaluateScript:@"_export._sub_export.method1()"];
     XCTAssertEqual(value.toInt32, 1);
 }
 
 - (void)test_method1_arg {
-    JSValue *value = [_context evaluateScript:@"_export.method1WithArg(12312321)"];
+    JSValue *value = [_context evaluateScript:@"_export._sub_export.method1WithArg(12312321)"];
     XCTAssertEqual(value.toInt32, 2);
 }
 

@@ -10,10 +10,18 @@
 
 @interface MDJSExport ()
 
-@property (nonatomic, strong) NSString *name;
+@property (nonatomic, weak, readonly) JSValue *javaScriptValue;
+
 @property (nonatomic, weak) JSContext *javaScriptContext;
 
+@property (nonatomic, strong) NSMutableArray<MDJSExport<JSExport> *> *mutableSubExports;
+
 - (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;
+- (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type;
 - (void)didInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;
+
+- (void)willRemoveFromContext:(JSContext *)context;
+- (void)removeFromContext:(JSContext *)context;
+- (void)didRemoveFromContext:(JSContext *)context;
 
 @end

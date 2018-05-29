@@ -21,6 +21,7 @@
     if (self = [super init]) {
         _name = name.copy;
         _injectType = type;
+        _mutableSubExports = [NSMutableArray array];
     }
     return self;
 }
@@ -31,26 +32,101 @@
 
 #pragma mark - accessor
 
+- (NSArray<MDJSExport<JSExport> *> *)subExports{
+    return _mutableSubExports.copy;
+}
+
 - (NSString *)description{
-    return [NSString stringWithFormat:@"<%@, %llu> name: %@, injectType: %lulu", self.class, (UInt64)self, _name, (unsigned long)_injectType];
+    return [NSString stringWithFormat:@"<%@, %llu> name: %@, injectType: %lu", self.class, (UInt64)self, _name, (unsigned long)_injectType];
+}
+
+#pragma mark - private
+
+- (void)_willInjectSubExportsToContext:(JSContext *)context type:(MDJSExportInjectType)type{
+    for (MDJSExport *export in _mutableSubExports.copy) {
+        if (!(type & export.injectType)) continue;
+        
+        [export willInjectToContext:context type:type];
+    }
+}
+
+- (void)_injectSubExportsForType:(MDJSExportInjectType)type{
+    for (MDJSExport *export in _mutableSubExports.copy) {
+        if (!(type & export.injectType)) continue;
+        
+        _javaScriptValue[export.name] = export;
+    }
+}
+
+- (void)_didInjectSubExportsToContext:(JSContext *)context type:(MDJSExportInjectType)type{
+    for (MDJSExport *export in _mutableSubExports.copy) {
+        if (!(type & export.injectType)) continue;
+        
+        [export didInjectToContext:context type:type];
+    }
+}
+
+- (void)_willRemoveSubExportsFromContext:(JSContext *)context{
+    for (MDJSExport *export in _mutableSubExports.copy) {
+        [export willRemoveFromContext:context];
+    }
+}
+
+- (void)_didRemoveSubExportsFromContext:(JSContext *)context{
+    for (MDJSExport *export in _mutableSubExports.copy) {
+        [export didRemoveFromContext:context];
+    }
+}
+
+- (void)_removeSubExport:(MDJSExport *)export{
+    _javaScriptValue[export.name] = nil;
 }
 
 #pragma mark - protected
 
 - (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{
-    self.javaScriptContext = context;
+    [self _willInjectSubExportsToContext:context type:type];
+}
+
+- (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+    _javaScriptValue = [JSValue valueWithObject:self inContext:context];
+    
+    context[self.name] = _javaScriptValue;
+    
+    [self _injectSubExportsForType:type];
 }
 
 - (void)didInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{
-    self.javaScriptContext = context;
 }
 
-- (void)willRemoveFromContext:(JSContext *)context type:(MDJSExportInjectType)type;{
-    self.javaScriptContext = nil;
+- (void)willRemoveFromContext:(JSContext *)context;{
+    [self _willRemoveSubExportsFromContext:context];
 }
 
-- (void)didRemoveFromContext:(JSContext *)context type:(MDJSExportInjectType)type;{
-    self.javaScriptContext = nil;
+- (void)removeFromContext:(JSContext *)context{
+    _javaScriptValue = nil;
+    context[self.name] = nil;
+}
+
+- (void)didRemoveFromContext:(JSContext *)context;{
+    [self _didRemoveSubExportsFromContext:context];
+}
+
+#pragma mark - public
+
+- (BOOL)addSubExport:(MDJSExport<JSExport> *)subExport;{
+    if ([_mutableSubExports containsObject:subExport]) return NO;
+    [_mutableSubExports addObject:subExport];
+    
+    return YES;
+}
+
+- (BOOL)removeSubExport:(MDJSExport<JSExport> *)subExport;{
+    if (![_mutableSubExports containsObject:subExport]) return NO;
+    [_mutableSubExports removeObject:subExport];
+    
+    [self _removeSubExport:subExport];
+    return YES;
 }
 
 @end

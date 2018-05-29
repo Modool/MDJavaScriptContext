@@ -62,7 +62,7 @@
 }
 
 - (void)testAddImport {
-    _import = MDJSImportInstance(MDJSImport, MDJSContextTestImport);
+    _import = MDJSImportAlloc(MDJSImport, MDJSContextTestImport);
     [_context addImport:_import];
     
     XCTAssertTrue([_context.mutableImports containsObject:_import]);

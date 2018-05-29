@@ -16,15 +16,23 @@
 typedef NS_ENUM(NSUInteger, MDJSExportInjectType) {
     MDJSExportInjectTypeBeforeLoading   = 1 << 0,
     MDJSExportInjectTypeAfterLoading    = 1 << 1,
+    
+    MDJSExportInjectTypeNone   = 0,
+    MDJSExportInjectTypeAll    = MDJSExportInjectTypeBeforeLoading | MDJSExportInjectTypeAfterLoading,
 };
 
 @interface MDJSExport : NSObject
 
-@property (nonatomic, strong, readonly) NSString *name;
+@property (nonatomic, copy, readonly) NSString *name;
+
+@property (nonatomic, copy, readonly) NSArray<MDJSExport<JSExport> *> *subExports;
 
 @property (nonatomic, assign, readonly) MDJSExportInjectType injectType;
 
 + (instancetype)exportWithName:(NSString *)name type:(MDJSExportInjectType)type;
 - (instancetype)initWithName:(NSString *)name type:(MDJSExportInjectType)type NS_DESIGNATED_INITIALIZER;
+
+- (BOOL)addSubExport:(MDJSExport<JSExport> *)subExport;
+- (BOOL)removeSubExport:(MDJSExport<JSExport> *)subExport;
 
 @end
