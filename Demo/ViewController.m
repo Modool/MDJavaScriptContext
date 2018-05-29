@@ -42,9 +42,9 @@ MDJSExportAs(set_test_multiple_parameter, - (void)setTestParameter1:(NSString *)
 MDJSImportAs(set_import_message, - (void)setImportMessage:(NSString *)message);
 MDJSImportAs(set_import_multiple_parameter, - (void)setImportParameter1:(int)parameter1 parameter2:(int)parameter2);
 
-MDJSImportPropertyAs(import_message, - (NSString *)importMessage);
+MDJSImportGetterAs(import_message, - (NSString *)importMessage);
 
-MDJSImportPropertyAs(import_closure, - (JSValue *)importClosure);
+MDJSImportGetterAs(import_closure, - (JSValue *)importClosure);
 
 @end
 

@@ -6,7 +6,9 @@
 //  Copyright © 2018年 markejave. All rights reserved.
 //
 
-#import <MDJavaScriptContext/MDJavaScriptContext.h>
+#import "MDJSImport.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface MDJSStringImport : MDJSImport
 
@@ -25,3 +27,5 @@
 - (instancetype)initWithFilePath:(NSString *)filePath protocol:(Protocol *)protocol type:(MDJSExportInjectType)type;
 
 @end
+
+NS_ASSUME_NONNULL_END

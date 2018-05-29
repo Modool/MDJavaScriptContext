@@ -23,10 +23,6 @@
     return self;
 }
 
-- (instancetype)initWithProtocol:(Protocol *)protocol{
-    return [self initWithJavaScript:nil protocol:protocol type:0];
-}
-
 + (instancetype)importWithData:(NSData *)data protocol:(Protocol *)protocol type:(MDJSExportInjectType)type;{
     return [[self alloc] initWithData:data protocol:protocol type:type];
 }

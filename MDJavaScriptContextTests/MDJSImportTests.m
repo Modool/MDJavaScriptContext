@@ -34,12 +34,13 @@ MDJSImportAs(function5, - (NSUInteger)function5WithArg:(NSString *)arg1 arg2:(NS
     // Put setup code here. This method is called before the invocation of each test method in the class.
     _context = [[JSContext alloc] init];
     _import = MDJSImportAlloc(MDJSImport, MDJSImportTestsImport);
+    
     _import.javaScriptContext = _context;
     
     NSBundle *bundle = [NSBundle bundleForClass:self.class];
     NSString *filepath = [bundle pathForResource:@"test" ofType:@"js"];
-    NSString *javascript = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:nil];
-    [_context evaluateScript:javascript];
+    NSString *javaScript = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:nil];
+    [_context evaluateScript:javaScript];
 }
 
 - (void)testFunction1 {

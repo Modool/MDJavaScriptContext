@@ -13,10 +13,12 @@
 #define MDJSExportAs    JSExportAs
 #endif
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSUInteger, MDJSExportInjectType) {
-    MDJSExportInjectTypeInitializing    = 1 << 0,
-    MDJSExportInjectTypeStartLoading   = 1 << 1,
-    MDJSExportInjectTypeAfterLoading    = 1 << 2,
+    MDJSExportInjectTypeInitializing = 1 << 0,
+    MDJSExportInjectTypeStartLoading = 1 << 1,
+    MDJSExportInjectTypeAfterLoading = 1 << 2,
     
     MDJSExportInjectTypeNone   = 0,
     MDJSExportInjectTypeAll    = MDJSExportInjectTypeInitializing | MDJSExportInjectTypeStartLoading | MDJSExportInjectTypeAfterLoading,
@@ -37,3 +39,5 @@ typedef NS_ENUM(NSUInteger, MDJSExportInjectType) {
 - (BOOL)removeSubExport:(MDJSExport<JSExport> *)subExport;
 
 @end
+
+NS_ASSUME_NONNULL_END

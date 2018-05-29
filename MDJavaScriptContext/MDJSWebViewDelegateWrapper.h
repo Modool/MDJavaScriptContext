@@ -8,9 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MDJSWebViewDelegateWrapper : NSObject <UIWebViewDelegate>
 
-@property (nonatomic, weak) id<UIWebViewDelegate> delegate;
+@property (nonatomic, weak, nullable) id<UIWebViewDelegate> delegate;
 
 @property (nonatomic, weak, readonly) id<UIWebViewDelegate> context;
 
@@ -18,3 +20,5 @@
 - (instancetype)initWithContext:(id<UIWebViewDelegate>)context;
 
 @end
+
+NS_ASSUME_NONNULL_END

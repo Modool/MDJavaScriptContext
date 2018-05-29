@@ -40,25 +40,25 @@
 
 #pragma mark - public
 
-- (BOOL)addExport:(MDJSExport<JSExport> *)export_;{
-    NSParameterAssert([export_ conformsToProtocol:@protocol(JSExport)]);
+- (BOOL)addExport:(MDJSExport<JSExport> *)export;{
+    NSParameterAssert([export conformsToProtocol:@protocol(JSExport)]);
     
-    if ([_mutableExports.allKeys containsObject:export_.name]) return NO;
-    if ([_mutableExports.allValues containsObject:export_]) return NO;
+    if ([_mutableExports.allKeys containsObject:export.name]) return NO;
+    if ([_mutableExports.allValues containsObject:export]) return NO;
     
-    _mutableExports[export_.name] = export_;
+    _mutableExports[export.name] = export;
     
-    if (export_.injectType & MDJSExportInjectTypeInitializing) {
-        [self _injectExport:export_ context:self.javaScriptContext];
+    if (export.injectType & MDJSExportInjectTypeInitializing) {
+        [self _injectExport:export context:self.javaScriptContext];
     }
     return YES;
 }
 
-- (BOOL)removeExport:(MDJSExport<JSExport> *)export_;{
-    if (![_mutableExports.allKeys containsObject:export_.name]) return NO;
-    [_mutableExports removeObjectForKey:export_.name];
+- (BOOL)removeExport:(MDJSExport<JSExport> *)export;{
+    if (![_mutableExports.allKeys containsObject:export.name]) return NO;
+    [_mutableExports removeObjectForKey:export.name];
     
-    [self _removeExport:export_ context:self.javaScriptContext];
+    [self _removeExport:export context:self.javaScriptContext];
     
     return YES;
 }

@@ -8,9 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class MDJSContext;
 @interface MDJSWebView : UIWebView
 
 @property (nonatomic, strong, readonly) MDJSContext *context;
 
 @end
+
+NS_ASSUME_NONNULL_END

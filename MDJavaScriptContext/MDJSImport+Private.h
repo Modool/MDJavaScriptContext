@@ -12,6 +12,9 @@
 
 @property (nonatomic, weak) JSContext *javaScriptContext;
 
+// Default is JSContext.globalObject
+@property (nonatomic, strong, readonly) JSValue *javaScriptObject;
+
 - (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;
 - (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type;
 - (void)didInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;

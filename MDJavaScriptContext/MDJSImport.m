@@ -73,7 +73,13 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 }
 
 - (instancetype)init{
-    return [self initWithProtocol:nil type:0];
+    return [self initWithProtocol:@protocol(MDJSImport) type:0];
+}
+
+#pragma mark - accessor
+
+- (JSValue *)javaScriptObject{
+    return self.javaScriptContext.globalObject;
 }
 
 #pragma mark - private
@@ -134,9 +140,11 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 
 - (JSValue *)_forwardFunction:(NSString *)function invocation:(NSInvocation *)invocation{
     NSArray *arguments = MDJSImportBoxValues(invocation);
-    JSValue *globalObject = self.javaScriptContext.globalObject;
+    JSValue *javaScriptObject = self.javaScriptObject;
 
-    return [globalObject invokeMethod:function withArguments:arguments];
+    if ([javaScriptObject isUndefined] || [javaScriptObject isNull]) return javaScriptObject;
+    
+    return [javaScriptObject invokeMethod:function withArguments:arguments];
 }
 
 - (void)_invokeInvocation:(NSInvocation *)invocation value:(JSValue *)value{
@@ -172,8 +180,7 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
                *type == *@encode(long) ||
                *type == *@encode(long long) ||
                *type == *@encode(bool)) {
-        
-        long long longLongValue = [[value toNumber] longLongValue];
+        long long longLongValue = ([value isUndefined] || [value isNull]) ? 0 : [[value toNumber] longLongValue];
         [invocation setReturnValue:&longLongValue];
     } else if (*type == *@encode(unsigned int) ||
                *type == *@encode(unsigned char) ||
@@ -181,11 +188,11 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
                *type == *@encode(unsigned long) ||
                *type == *@encode(unsigned long long)) {
         
-        unsigned long long unsignedLongLongValue = [[value toNumber] unsignedLongLongValue];
+        unsigned long long unsignedLongLongValue = ([value isUndefined] || [value isNull]) ? 0 : [[value toNumber] unsignedLongLongValue];
         [invocation setReturnValue:&unsignedLongLongValue];
     } else if (*type == *@encode(double) || *type == *@encode(float)) {
         
-        double doubleValue = [[value toNumber] doubleValue];
+        double doubleValue = ([value isUndefined] || [value isNull]) ? 0 : [[value toNumber] doubleValue];
         [invocation setReturnValue:&doubleValue];
     } else if (*type != 'v') {
         [invocation setReturnValue:&value];

@@ -11,16 +11,18 @@
 #ifndef __MDJSImportAs__
 #define __MDJSImportAs__
 
-#define MDJSImportAlloc(CLASS, PROTOCOL)     [CLASS<PROTOCOL> importWithProtocol:@protocol(PROTOCOL) type:MDJSExportInjectTypeAll]
-#define MDJSImportAlloc2(CLASS, PROTOCOL, TYPE)     [CLASS<PROTOCOL> importWithProtocol:@protocol(PROTOCOL) type:TYPE]
+#define MDJSImportAlloc(CLASS, PROTOCOL)            [CLASS<PROTOCOL> importWithProtocol:@protocol(PROTOCOL) type:MDJSExportInjectTypeAll]
+#define MDJSImportAlloc1(CLASS, PROTOCOL, TYPE)     [CLASS<PROTOCOL> importWithProtocol:@protocol(PROTOCOL) type:TYPE]
 
 #define MDJSImportAs(PropertyName, Selector)  \
 @optional Selector __MDJS_IMPORT_AS__##PropertyName:(id)argument; @optional Selector
 
-#define MDJSImportPropertyAs(PropertyName, Selector) \
-@optional Selector##__MDJS_IMPORT_AS__##PropertyName; @optional Selector
+#define MDJSImportGetterAs(GetterName, Selector) \
+@optional Selector##__MDJS_IMPORT_AS__##GetterName; @optional Selector
 
 #endif
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol MDJSImport <NSObject>
 @end
@@ -35,3 +37,5 @@
 - (instancetype)initWithProtocol:(Protocol *)protocol type:(MDJSExportInjectType)type NS_DESIGNATED_INITIALIZER;
 
 @end
+
+NS_ASSUME_NONNULL_END
