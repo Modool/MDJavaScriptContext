@@ -35,12 +35,18 @@
 		087196B720B6676700151EBD /* MDJSExportTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 087196B620B6676700151EBD /* MDJSExportTests.m */; };
 		087196B920B6678F00151EBD /* MDJSImportTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 087196B820B6678F00151EBD /* MDJSImportTests.m */; };
 		087196BB20B675A400151EBD /* test.js in Resources */ = {isa = PBXBuildFile; fileRef = 087196BA20B675A400151EBD /* test.js */; };
-		08A63C7320BCF09F00483EF6 /* MDJSStringImport.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63C7120BCF09F00483EF6 /* MDJSStringImport.h */; };
-		08A63C7420BCF09F00483EF6 /* MDJSStringImport.m in Sources */ = {isa = PBXBuildFile; fileRef = 08A63C7220BCF09F00483EF6 /* MDJSStringImport.m */; };
-		08A63CB720BD332C00483EF6 /* MDJSObjectImport.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CB520BD332C00483EF6 /* MDJSObjectImport.h */; };
-		08A63CB820BD332C00483EF6 /* MDJSObjectImport.m in Sources */ = {isa = PBXBuildFile; fileRef = 08A63CB620BD332C00483EF6 /* MDJSObjectImport.m */; };
 		08A63CBA20BD380D00483EF6 /* MDJSStringImportTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 08A63CB920BD380D00483EF6 /* MDJSStringImportTests.m */; };
 		08A63CBE20BD382A00483EF6 /* MDJSObjectImportTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 08A63CBD20BD382A00483EF6 /* MDJSObjectImportTests.m */; };
+		08A63CE120BD53E100483EF6 /* MDJSWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CE020BD53E100483EF6 /* MDJSWindow.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08A63CE420BE43AA00483EF6 /* MDJSImport+Additions.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CE220BE43AA00483EF6 /* MDJSImport+Additions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08A63CE520BE43AA00483EF6 /* MDJSImport+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 08A63CE320BE43AA00483EF6 /* MDJSImport+Additions.m */; };
+		08A63CE720BE471100483EF6 /* MDJSDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CE620BE471100483EF6 /* MDJSDocument.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08A63CE920BE482A00483EF6 /* MDJSHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CE820BE482A00483EF6 /* MDJSHistory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08A63CEB20BE48D000483EF6 /* MDJSLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CEA20BE48D000483EF6 /* MDJSLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08A63CED20BE492900483EF6 /* MDJSNavigator.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CEC20BE492900483EF6 /* MDJSNavigator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08A63CEF20BE4A8700483EF6 /* MDJSScreen.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CEE20BE4A8700483EF6 /* MDJSScreen.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		08A63CF120BE4AFB00483EF6 /* MDJSKeyValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 08A63CF020BE4AFB00483EF6 /* MDJSKeyValue.h */; };
+		08A63CF220BE5B1500483EF6 /* test.html in Resources */ = {isa = PBXBuildFile; fileRef = 0825517620B3C2C000A272AE /* test.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,12 +102,17 @@
 		087196B620B6676700151EBD /* MDJSExportTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSExportTests.m; sourceTree = "<group>"; };
 		087196B820B6678F00151EBD /* MDJSImportTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSImportTests.m; sourceTree = "<group>"; };
 		087196BA20B675A400151EBD /* test.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = test.js; sourceTree = "<group>"; };
-		08A63C7120BCF09F00483EF6 /* MDJSStringImport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSStringImport.h; sourceTree = "<group>"; };
-		08A63C7220BCF09F00483EF6 /* MDJSStringImport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSStringImport.m; sourceTree = "<group>"; };
-		08A63CB520BD332C00483EF6 /* MDJSObjectImport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSObjectImport.h; sourceTree = "<group>"; };
-		08A63CB620BD332C00483EF6 /* MDJSObjectImport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSObjectImport.m; sourceTree = "<group>"; };
 		08A63CB920BD380D00483EF6 /* MDJSStringImportTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSStringImportTests.m; sourceTree = "<group>"; };
 		08A63CBD20BD382A00483EF6 /* MDJSObjectImportTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDJSObjectImportTests.m; sourceTree = "<group>"; };
+		08A63CE020BD53E100483EF6 /* MDJSWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSWindow.h; sourceTree = "<group>"; };
+		08A63CE220BE43AA00483EF6 /* MDJSImport+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MDJSImport+Additions.h"; sourceTree = "<group>"; };
+		08A63CE320BE43AA00483EF6 /* MDJSImport+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "MDJSImport+Additions.m"; sourceTree = "<group>"; };
+		08A63CE620BE471100483EF6 /* MDJSDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSDocument.h; sourceTree = "<group>"; };
+		08A63CE820BE482A00483EF6 /* MDJSHistory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSHistory.h; sourceTree = "<group>"; };
+		08A63CEA20BE48D000483EF6 /* MDJSLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSLocation.h; sourceTree = "<group>"; };
+		08A63CEC20BE492900483EF6 /* MDJSNavigator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSNavigator.h; sourceTree = "<group>"; };
+		08A63CEE20BE4A8700483EF6 /* MDJSScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSScreen.h; sourceTree = "<group>"; };
+		08A63CF020BE4AFB00483EF6 /* MDJSKeyValue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDJSKeyValue.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,10 +176,15 @@
 				086710AF20B2C86100BC9967 /* MDJSImport.h */,
 				086710B020B2C86100BC9967 /* MDJSImport.m */,
 				086710C620B3BE6C00BC9967 /* MDJSImport+Private.h */,
-				08A63C7120BCF09F00483EF6 /* MDJSStringImport.h */,
-				08A63C7220BCF09F00483EF6 /* MDJSStringImport.m */,
-				08A63CB520BD332C00483EF6 /* MDJSObjectImport.h */,
-				08A63CB620BD332C00483EF6 /* MDJSObjectImport.m */,
+				08A63CE220BE43AA00483EF6 /* MDJSImport+Additions.h */,
+				08A63CE320BE43AA00483EF6 /* MDJSImport+Additions.m */,
+				08A63CE020BD53E100483EF6 /* MDJSWindow.h */,
+				08A63CE620BE471100483EF6 /* MDJSDocument.h */,
+				08A63CE820BE482A00483EF6 /* MDJSHistory.h */,
+				08A63CEA20BE48D000483EF6 /* MDJSLocation.h */,
+				08A63CEC20BE492900483EF6 /* MDJSNavigator.h */,
+				08A63CEE20BE4A8700483EF6 /* MDJSScreen.h */,
+				08A63CF020BE4AFB00483EF6 /* MDJSKeyValue.h */,
 				086710BA20B2DFD400BC9967 /* MDJSWebView.h */,
 				086710BB20B2DFD400BC9967 /* MDJSWebView.m */,
 				086710C020B3B5C500BC9967 /* MDJSWebViewDelegateWrapper.h */,
@@ -225,15 +241,21 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				08A63C7320BCF09F00483EF6 /* MDJSStringImport.h in Headers */,
+				08A63CEF20BE4A8700483EF6 /* MDJSScreen.h in Headers */,
+				08A63CE120BD53E100483EF6 /* MDJSWindow.h in Headers */,
+				08A63CE720BE471100483EF6 /* MDJSDocument.h in Headers */,
+				08A63CF120BE4AFB00483EF6 /* MDJSKeyValue.h in Headers */,
+				08A63CED20BE492900483EF6 /* MDJSNavigator.h in Headers */,
 				086710C520B3BE4100BC9967 /* MDJSExport+Private.h in Headers */,
-				08A63CB720BD332C00483EF6 /* MDJSObjectImport.h in Headers */,
 				086710A920B2C84500BC9967 /* MDJSContext.h in Headers */,
+				08A63CE420BE43AA00483EF6 /* MDJSImport+Additions.h in Headers */,
 				086710A120B2C81800BC9967 /* MDJavaScriptContext.h in Headers */,
 				086710BC20B2DFD400BC9967 /* MDJSWebView.h in Headers */,
+				08A63CE920BE482A00483EF6 /* MDJSHistory.h in Headers */,
 				086710AD20B2C85600BC9967 /* MDJSExport.h in Headers */,
 				086710C220B3B5C500BC9967 /* MDJSWebViewDelegateWrapper.h in Headers */,
 				086710B120B2C86100BC9967 /* MDJSImport.h in Headers */,
+				08A63CEB20BE48D000483EF6 /* MDJSLocation.h in Headers */,
 				086710BF20B3B4BA00BC9967 /* MDJSContext+Private.h in Headers */,
 				086710C720B3BE6C00BC9967 /* MDJSImport+Private.h in Headers */,
 			);
@@ -359,6 +381,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08A63CF220BE5B1500483EF6 /* test.html in Resources */,
 				087196BB20B675A400151EBD /* test.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -372,11 +395,10 @@
 			files = (
 				086710AA20B2C84500BC9967 /* MDJSContext.m in Sources */,
 				086710BD20B2DFD400BC9967 /* MDJSWebView.m in Sources */,
+				08A63CE520BE43AA00483EF6 /* MDJSImport+Additions.m in Sources */,
 				086710C320B3B5C500BC9967 /* MDJSWebViewDelegateWrapper.m in Sources */,
-				08A63CB820BD332C00483EF6 /* MDJSObjectImport.m in Sources */,
 				086710AE20B2C85600BC9967 /* MDJSExport.m in Sources */,
 				086710B220B2C86100BC9967 /* MDJSImport.m in Sources */,
-				08A63C7420BCF09F00483EF6 /* MDJSStringImport.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

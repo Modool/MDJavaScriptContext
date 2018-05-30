@@ -37,7 +37,7 @@ MDJSExportAs(set_test_multiple_parameter, - (void)setTestParameter1:(NSString *)
 
 @end
 
-@protocol TextImport <NSObject>
+@protocol TextImport <MDJSImport>
 
 MDJSImportAs(set_import_message, - (void)setImportMessage:(NSString *)message);
 MDJSImportAs(set_import_multiple_parameter, - (void)setImportParameter1:(int)parameter1 parameter2:(int)parameter2);
@@ -73,12 +73,12 @@ MDJSImportGetterAs(import_closure, - (JSValue *)importClosure);
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.export = [[TestExport alloc] initWithName:@"test" type:MDJSExportInjectTypeAfterLoading];
-    self.import = MDJSImportAlloc(MDJSImport, TextImport);
-    
-    [self.webView.context addExport:self.export];
-    [self.webView.context addImport:self.import];
-    
+//    self.export = [[TestExport alloc] initWithName:@"test" type:MDJSExportInjectTypeAfterLoading];
+//    self.import = MDJSImportAlloc(MDJSImport, TextImport);
+//    
+//    [self.webView.context addExport:self.export];
+//    [self.webView.context addImport:self.import];
+//    
     [self.webView loadHTMLString:[NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"test" ofType:@"html"] encoding:NSUTF8StringEncoding error:nil] baseURL:nil];
 }
 

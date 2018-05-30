@@ -21,3 +21,10 @@ FOUNDATION_EXPORT const unsigned char MDJavaScriptContextVersionString[];
 #import <MDJavaScriptContext/MDJSImport.h>
 #import <MDJavaScriptContext/MDJSWebView.h>
 
+#import <MDJavaScriptContext/MDJSWindow.h>
+#import <MDJavaScriptContext/MDJSDocument.h>
+#import <MDJavaScriptContext/MDJSHistory.h>
+#import <MDJavaScriptContext/MDJSLocation.h>
+#import <MDJavaScriptContext/MDJSNavigator.h>
+#import <MDJavaScriptContext/MDJSScreen.h>
+#import <MDJavaScriptContext/MDJSImport+Additions.h>

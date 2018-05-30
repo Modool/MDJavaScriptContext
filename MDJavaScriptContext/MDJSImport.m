@@ -84,8 +84,14 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 
 #pragma mark - private
 
-- (NSString *)_functionForSelector:(SEL)selector{
-    NSString *functionName = [self _functionNameWithSelector:selector required:NO];
+- (NSString *)_functionForSelector:(SEL)selector isProperty:(BOOL *)isProperty isGetter:(BOOL *)isGetter{
+    NSString *functionName = [self _propertyNameWithSelector:selector isGetter:isGetter];
+    if (functionName.length) {
+        *isProperty = YES;
+        return functionName;
+    }
+    
+    functionName = [self _functionNameWithSelector:selector required:NO];
 
     if (!functionName.length) {
         functionName = [self _functionNameWithSelector:selector required:YES];
@@ -120,6 +126,48 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
     return functionName;
 }
 
+- (const char *)_setterName:(const char *)name{
+    size_t nameLength = strlen(name);
+    char* setterName = (char*)malloc(nameLength + 5); // "set" Name ":\0"
+    setterName[0] = 's';
+    setterName[1] = 'e';
+    setterName[2] = 't';
+    setterName[3] = toupper(*name);
+    memcpy(setterName + 4, name + 1, nameLength - 1);
+    setterName[nameLength + 3] = ':';
+    setterName[nameLength + 4] = '\0';
+    
+    return setterName;
+}
+
+- (NSString *)_propertyNameWithSelector:(SEL)selector isGetter:(BOOL *)isGetter{
+    const char *selectorName = sel_getName(selector);
+    
+    unsigned int count = 0;
+    objc_property_t *properties = protocol_copyPropertyList(_protocol, &count);
+    for (int index = 0; index < count; index++) {
+        objc_property_t property = properties[index];
+        
+        const char *name = property_getName(property);
+        if (strcmp(selectorName, name) == 0) {
+            *isGetter = YES;
+            return @(name);
+        }
+        const char *getter = property_copyAttributeValue(property, "G");
+        if (getter && strcmp(selectorName, getter) == 0) {
+            *isGetter = YES;
+            return @(name);
+        }
+        const char *setter = [self _setterName:name];
+        if (strcmp(selectorName, setter) == 0) return @(name);
+        
+        setter = property_copyAttributeValue(property, "S");
+        if (setter && strcmp(selectorName, setter) == 0)return @(name);
+    }
+    
+    return nil;
+}
+
 - (NSString *)_defaultFunctionNameFromSelectorName:(NSString *)selectorName{
     BOOL isGetter = ![selectorName containsString:@":"];
     if (isGetter) return selectorName;
@@ -138,6 +186,18 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
     return result.copy;
 }
 
+- (JSValue *)_forwardProperty:(NSString *)property invocation:(NSInvocation *)invocation isGetter:(BOOL)isGetter{
+    NSArray *arguments = MDJSImportBoxValues(invocation);
+    JSValue *javaScriptObject = self.javaScriptObject;
+    
+    if ([javaScriptObject isUndefined] || [javaScriptObject isNull]) return javaScriptObject;
+    
+    if (isGetter) return [javaScriptObject valueForProperty:property];
+    else [javaScriptObject setValue:arguments.firstObject forProperty:property];
+    
+    return [JSValue valueWithUndefinedInContext:javaScriptObject.context];
+}
+
 - (JSValue *)_forwardFunction:(NSString *)function invocation:(NSInvocation *)invocation{
     NSArray *arguments = MDJSImportBoxValues(invocation);
     JSValue *javaScriptObject = self.javaScriptObject;
@@ -148,31 +208,48 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 }
 
 - (void)_invokeInvocation:(NSInvocation *)invocation value:(JSValue *)value{
+    BOOL isNull = value.isUndefined || value.isNull;
     const char *type = invocation.methodSignature.methodReturnType;
     NSUInteger length = invocation.methodSignature.methodReturnLength;
     
     if (*type == '@') {
-        if (![value isUndefined] && ![value isNull] && !JSObjectIsFunction(value.context.JSGlobalContextRef, (JSObjectRef)value.JSValueRef)) {
-            if ([value isString]) {
-                NSString *string = [value toString];
+        if (!isNull && !JSObjectIsFunction(value.context.JSGlobalContextRef, (JSObjectRef)value.JSValueRef)) {
+            if (value.isString) {
+                NSString *string = value.toString;
                 [invocation setReturnValue:&string];
-            } else if ([value isObject]) {
-                id object = [value toObject];
+            } else if (value.isNumber) {
+                id object = value.toNumber;
                 [invocation setReturnValue:&object];
+            } else {
+                [invocation setReturnValue:&value];
             }
         }
     } else if (*type == '{'){
-        id obj = [value toObject];
-        if ([obj isKindOfClass:NSValue.class]) {
-            void *structValue = NULL;
-            if (@available(iOS 11, *)) {
-                [obj getValue:&structValue size:length];
-            } else {
-                [obj getValue:&structValue];
-            }
-            [invocation setReturnValue:&structValue];
+        if (strcmp(type, @encode(CGPoint)) == 0) {
+            CGPoint point = value.toPoint;
+            [invocation setReturnValue:&point];
+        } else if (strcmp(type, @encode(CGSize)) == 0) {
+            CGSize size = value.toSize;
+            [invocation setReturnValue:&size];
+        } else if (strcmp(type, @encode(NSRange)) == 0) {
+            NSRange range = value.toRange;
+            [invocation setReturnValue:&range];
+        } else if (strcmp(type, @encode(CGRect)) == 0) {
+            CGRect rect = value.toRect;
+            [invocation setReturnValue:&rect];
         } else {
-            [invocation setReturnValue:&obj];
+            id obj = value.toObject;
+            if ([obj isKindOfClass:NSValue.class]) {
+                void *structValue = NULL;
+                if (@available(iOS 11, *)) {
+                    [obj getValue:&structValue size:length];
+                } else {
+                    [obj getValue:&structValue];
+                }
+                [invocation setReturnValue:&structValue];
+            } else {
+                [invocation setReturnValue:&obj];
+            }
         }
     } else if (*type == *@encode(int) ||
                *type == *@encode(char) ||
@@ -180,24 +257,23 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
                *type == *@encode(long) ||
                *type == *@encode(long long) ||
                *type == *@encode(bool)) {
-        long long longLongValue = ([value isUndefined] || [value isNull]) ? 0 : [[value toNumber] longLongValue];
-        [invocation setReturnValue:&longLongValue];
+        long long result = isNull ? 0 : value.toNumber.longLongValue;
+        [invocation setReturnValue:&result];
     } else if (*type == *@encode(unsigned int) ||
                *type == *@encode(unsigned char) ||
                *type == *@encode(unsigned short) ||
                *type == *@encode(unsigned long) ||
                *type == *@encode(unsigned long long)) {
         
-        unsigned long long unsignedLongLongValue = ([value isUndefined] || [value isNull]) ? 0 : [[value toNumber] unsignedLongLongValue];
-        [invocation setReturnValue:&unsignedLongLongValue];
+        unsigned long long result = isNull ? 0 : value.toNumber.unsignedLongLongValue;
+        [invocation setReturnValue:&result];
     } else if (*type == *@encode(double) || *type == *@encode(float)) {
         
-        double doubleValue = ([value isUndefined] || [value isNull]) ? 0 : [[value toNumber] doubleValue];
+        double doubleValue = isNull ? 0 : value.toNumber.doubleValue;
         [invocation setReturnValue:&doubleValue];
     } else if (*type != 'v') {
         [invocation setReturnValue:&value];
     }
-    
     invocation.target = nil;
     [invocation invoke];
 }
@@ -213,16 +289,19 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
         *description = desc;
         return YES;
     }
-    
     return NO;
 }
 
 #pragma mark - protected
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation{
-    NSString *functionName = [self _functionForSelector:anInvocation.selector];
-    if (functionName.length) {
-        JSValue *value = [self _forwardFunction:functionName invocation:anInvocation];
+    BOOL isProperty = NO, isGetter = NO;
+    NSString *name = [self _functionForSelector:anInvocation.selector isProperty:&isProperty isGetter:&isGetter];
+    if (name.length) {
+        JSValue *value = nil;
+        if (isProperty) value = [self _forwardProperty:name invocation:anInvocation isGetter:isGetter];
+        else value = [self _forwardFunction:name invocation:anInvocation];
+        
         [self _invokeInvocation:anInvocation value:value];
     } else {
         [super forwardInvocation:anInvocation];
@@ -254,6 +333,74 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 }
 
 - (void)didRemoveFromContext:(JSContext *)context;{
+}
+
+@end
+
+@implementation MDJSStringImport
+
+- (instancetype)initWithJavaScript:(NSString *)javaScript protocol:(Protocol *)protocol type:(MDJSExportInjectType)type;{
+    NSParameterAssert(javaScript.length);
+    if (self = [super initWithProtocol:protocol type:type]) {
+        _javaScript = javaScript.copy;
+    }
+    return self;
+}
+
+- (instancetype)initWithData:(NSData *)data protocol:(Protocol *)protocol type:(MDJSExportInjectType)type;{
+    NSString *javaScript = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    return [self initWithJavaScript:javaScript protocol:protocol type:type];
+}
+
+- (instancetype)initWithFilePath:(NSString *)filePath protocol:(Protocol *)protocol type:(MDJSExportInjectType)type;{
+    NSError *error = nil;
+    NSString *javaScript = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
+    if (error) return nil;
+    
+    return [self initWithJavaScript:javaScript protocol:protocol type:type];
+}
+
+- (instancetype)initWithProtocol:(Protocol *)protocol type:(MDJSExportInjectType)type{
+    return [self initWithJavaScript:nil protocol:protocol type:type];
+}
+
+#pragma mark - protected
+
+- (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+    [context evaluateScript:_javaScript];
+}
+
+@end
+
+@implementation MDJSObjectImport
+
+- (instancetype)initWithKeyPath:(NSString *)keyPath protocol:(Protocol *)protocol type:(MDJSExportInjectType)type{
+    if (self = [super initWithProtocol:protocol type:type]) {
+        _keyPath = keyPath.copy;
+    }
+    return self;
+}
+
+- (instancetype)initWithObject:(JSValue *)object protocol:(Protocol *)protocol;{
+    if (self = [super initWithProtocol:protocol type:0]) {
+        _referencedObject = object;
+    }
+    return self;
+}
+
+- (instancetype)initWithProtocol:(Protocol *)protocol type:(MDJSExportInjectType)type{
+    return [self initWithKeyPath:nil protocol:protocol type:type];
+}
+
+#pragma mark - accessor
+
+- (JSValue *)javaScriptObject{
+    JSValue *value = _referencedObject ?: self.javaScriptContext.globalObject;
+    NSArray<NSString *> *keys = [_keyPath componentsSeparatedByString:@"."];
+    for (NSString *key in keys) {
+        value = [value objectForKeyedSubscript:key];
+    }
+    return value ?: [super javaScriptObject];
 }
 
 @end

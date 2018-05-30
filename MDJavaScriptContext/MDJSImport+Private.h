@@ -24,3 +24,23 @@
 - (void)didRemoveFromContext:(JSContext *)context;
 
 @end
+
+@interface MDJSStringImport : MDJSImport
+
+@property (nonatomic, copy, readonly) NSString *javaScript;
+
+- (instancetype)initWithJavaScript:(NSString *)javaScript protocol:(Protocol *)protocol type:(MDJSExportInjectType)type NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithData:(NSData *)data protocol:(Protocol *)protocol type:(MDJSExportInjectType)type;
+- (instancetype)initWithFilePath:(NSString *)filePath protocol:(Protocol *)protocol type:(MDJSExportInjectType)type;
+
+@end
+
+@interface MDJSObjectImport : MDJSImport
+
+@property (nonatomic, copy, readonly) JSValue *referencedObject;
+@property (nonatomic, copy, readonly) NSString *keyPath;
+
+- (instancetype)initWithKeyPath:(NSString *)keyPath protocol:(Protocol *)protocol type:(MDJSExportInjectType)type NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithObject:(JSValue *)object protocol:(Protocol *)protocol NS_DESIGNATED_INITIALIZER;
+
+@end

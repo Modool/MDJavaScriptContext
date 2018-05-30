@@ -9,9 +9,7 @@
 #import <XCTest/XCTest.h>
 #import "MDJSContext.h"
 #import "MDJSContext+Private.h"
-
-#import "MDJSStringImport.h"
-#import "MDJSObjectImport.h"
+#import "MDJSImport+Private.h"
 
 @protocol MDJSObjectImportTestsImport <MDJSImport>
 

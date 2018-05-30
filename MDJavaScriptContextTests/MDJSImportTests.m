@@ -11,6 +11,8 @@
 
 @protocol MDJSImportTestsImport <MDJSImport>
 
+@property NSUInteger property1;
+
 - (NSUInteger)function1;
 - (NSUInteger)function2:(NSString *)arg;
 - (NSUInteger)function3:(NSString *)arg1 :(NSString *)arg2;
@@ -41,6 +43,30 @@ MDJSImportAs(function5, - (NSUInteger)function5WithArg:(NSString *)arg1 arg2:(NS
     NSString *filepath = [bundle pathForResource:@"test" ofType:@"js"];
     NSString *javaScript = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:nil];
     [_context evaluateScript:javaScript];
+}
+
+- (void)testReadProperty1 {
+    NSUInteger value = _import.property1;
+    XCTAssertEqual(value, 10);
+}
+
+- (void)testWriteProperty1 {
+    _import.property1 = 100;
+    
+    NSUInteger value = _import.property1;
+    XCTAssertEqual(value, 100);
+}
+
+- (void)testProperty1Getter {
+    NSUInteger value = [_import property1];
+    XCTAssertEqual(value, 10);
+}
+
+- (void)testProperty1Setter {
+    [_import setProperty1:100];
+    
+    NSUInteger value = _import.property1;
+    XCTAssertEqual(value, 100);
 }
 
 - (void)testFunction1 {
