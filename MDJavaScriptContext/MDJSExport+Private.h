@@ -10,18 +10,18 @@
 
 @interface MDJSExport ()
 
-@property (nonatomic, weak, readonly) JSValue *javaScriptValue;
-
 @property (nonatomic, weak) JSContext *javaScriptContext;
+
+@property (nonatomic, strong, readonly) JSValue *javaScriptValue;
 
 @property (nonatomic, strong) NSMutableArray<MDJSExport<JSExport> *> *mutableSubExports;
 
-- (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;
-- (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type;
-- (void)didInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;
+- (void)willInjectToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type;
+- (void)injectToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type;
+- (void)didInjectToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type;
 
-- (void)willRemoveFromContext:(JSContext *)context;
-- (void)removeFromContext:(JSContext *)context;
-- (void)didRemoveFromContext:(JSContext *)context;
+- (void)willRemoveFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject;
+- (void)removeFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject;
+- (void)didRemoveFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject;
 
 @end

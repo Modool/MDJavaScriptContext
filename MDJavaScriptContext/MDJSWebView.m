@@ -12,7 +12,7 @@
 #import "MDJSContext+Private.h"
 #import "MDJSWebViewDelegateWrapper.h"
 
-@interface MDJSWebView ()
+@interface MDJSWebView ()<UIWebViewDelegate>
 
 @property (nonatomic, strong) MDJSContext *context;
 
@@ -37,7 +37,7 @@
 
 - (void)initialize{
     _context = [[MDJSContext alloc] initWithWebView:self];
-    _wrapper = [[MDJSWebViewDelegateWrapper alloc] initWithContext:_context];
+    _wrapper = [[MDJSWebViewDelegateWrapper alloc] initWithContext:_context webView:self];
     
     super.delegate = _wrapper;
 }

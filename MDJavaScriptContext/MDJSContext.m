@@ -21,7 +21,6 @@
 - (instancetype)initWithWebView:(UIWebView *)webView;{
     if (self = [super init]) {
         _webView = webView;
-        _javaScriptContext = webView.javaScriptContext;
         _mutableExports = NSMutableDictionary.dictionary;
         _mutableImports = NSMutableArray.array;
     }
@@ -36,6 +35,18 @@
 
 - (NSArray<MDJSImport *> *)imports{
     return _mutableImports.copy;
+}
+
+- (JSContext *)javaScriptContext{
+    if (!_javaScriptContext) {
+        _javaScriptContext = _webView.javaScriptContext ?: [JSContext currentContext];
+        
+    }
+    return _javaScriptContext;
+}
+
+- (JSValue *)globalObject{
+    return self.javaScriptContext.globalObject;
 }
 
 #pragma mark - public
@@ -82,9 +93,17 @@
     return YES;
 }
 
+- (JSValue *)evaluateScript:(NSString *)script;{
+    return [self.javaScriptContext evaluateScript:script];
+}
+
+- (JSValue *)evaluateScript:(NSString *)script withSourceURL:(NSURL *)sourceURL;{
+    return [self.javaScriptContext evaluateScript:script withSourceURL:sourceURL];
+}
+
 #pragma mark - private
 
-- (void)_injectExportsForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+- (void)_injectExportsToContext:(JSContext *)context type:(MDJSExportInjectType)type{
     NSDictionary<NSString *, MDJSExport *> *exports = _mutableExports.copy;
     for (NSString *name in exports.allKeys) {
         MDJSExport *export = exports[name];
@@ -96,20 +115,20 @@
 
 - (void)_injectExport:(MDJSExport *)export context:(JSContext *)context{
     export.javaScriptContext = context;
-    [export willInjectToContext:context type:export.injectType];
-    [export injectExportForContext:context type:export.injectType];
-    [export didInjectToContext:context type:export.injectType];
+    [export willInjectToContext:context javaScriptObject:context.globalObject type:export.injectType];
+    [export injectToContext:context javaScriptObject:context.globalObject type:export.injectType];
+    [export didInjectToContext:context javaScriptObject:context.globalObject type:export.injectType];
 }
 
 - (void)_removeExport:(MDJSExport *)export context:(JSContext *)context{
-    [export willRemoveFromContext:context];
-    [export removeFromContext:context];
-    [export didRemoveFromContext:context];
+    [export willRemoveFromContext:context javaScriptObject:context.globalObject];
+    [export removeFromContext:context javaScriptObject:context.globalObject];
+    [export didRemoveFromContext:context javaScriptObject:context.globalObject];
     
     export.javaScriptContext = nil;
 }
 
-- (void)_injectImportsForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+- (void)_injectImportsToContext:(JSContext *)context type:(MDJSExportInjectType)type{
     for (MDJSImport *import in _mutableImports.copy) {
         if (!(import.injectType & type)) continue;
         [self _injectImport:import context:context];
@@ -137,16 +156,16 @@
     JSContext *context = webView.javaScriptContext;
     self.javaScriptContext = context;
     
-    [self _injectExportsForContext:context type:MDJSExportInjectTypeStartLoading];
-    [self _injectImportsForContext:context type:MDJSExportInjectTypeStartLoading];
+    [self _injectExportsToContext:context type:MDJSExportInjectTypeStartLoading];
+    [self _injectImportsToContext:context type:MDJSExportInjectTypeStartLoading];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView;{
     JSContext *context = webView.javaScriptContext;
     self.javaScriptContext = context;
     
-    [self _injectExportsForContext:context type:MDJSExportInjectTypeAfterLoading];
-    [self _injectImportsForContext:context type:MDJSExportInjectTypeAfterLoading];
+    [self _injectExportsToContext:context type:MDJSExportInjectTypeAfterLoading];
+    [self _injectImportsToContext:context type:MDJSExportInjectTypeAfterLoading];
 }
 
 @end

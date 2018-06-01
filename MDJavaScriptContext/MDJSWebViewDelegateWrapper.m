@@ -10,33 +10,38 @@
 
 @implementation MDJSWebViewDelegateWrapper
 
-+ (instancetype)wrapperWithContext:(id<UIWebViewDelegate>)context;{
-    return [[self alloc] initWithContext:context];
++ (instancetype)wrapperWithContext:(id<UIWebViewDelegate>)context webView:(id<UIWebViewDelegate>)webView;{
+    return [[self alloc] initWithContext:context webView:webView];
 }
 
-- (instancetype)initWithContext:(id<UIWebViewDelegate>)context;{
+- (instancetype)initWithContext:(id<UIWebViewDelegate>)context webView:(id<UIWebViewDelegate>)webView;{
     if (self = [super init])  {
         _context = context;
+        _webView = webView;
     }
     return self;
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation{
     if ([anInvocation selector] == @selector(webView:shouldStartLoadWithRequest:navigationType:)) {
-        [anInvocation invokeWithTarget:self.delegate];
+        [anInvocation invokeWithTarget:_delegate];
     } else {
-        if ([[self context] respondsToSelector:anInvocation.selector]) {
+        if ([_context respondsToSelector:anInvocation.selector]) {
             NSInvocation *newInvocation = [self duplicateInvocation:anInvocation];
-            [newInvocation invokeWithTarget:self.context];
+            [newInvocation invokeWithTarget:_context];
         }
-        if ([[self delegate] respondsToSelector:anInvocation.selector]) {
-            [anInvocation invokeWithTarget:self.delegate];
+        if ([_webView respondsToSelector:anInvocation.selector]) {
+            NSInvocation *newInvocation = [self duplicateInvocation:anInvocation];
+            [newInvocation invokeWithTarget:_webView];
+        }
+        if ([_delegate respondsToSelector:anInvocation.selector]) {
+            [anInvocation invokeWithTarget:_delegate];
         }
     }
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector{
-    return [[self delegate] respondsToSelector:aSelector] || [[self context] respondsToSelector:aSelector];
+    return [_delegate respondsToSelector:aSelector] || [_context respondsToSelector:aSelector] || [_webView respondsToSelector:aSelector];
 }
 
 - (NSInvocation *)duplicateInvocation:(NSInvocation *)origInvocation {

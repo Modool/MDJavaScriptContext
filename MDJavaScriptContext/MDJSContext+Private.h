@@ -23,11 +23,11 @@
 
 - (instancetype)initWithWebView:(UIWebView *)webView;
 
-- (void)_injectExportsForContext:(JSContext *)context type:(MDJSExportInjectType)type;
+- (void)_injectExportsToContext:(JSContext *)context type:(MDJSExportInjectType)type;
 - (void)_injectExport:(MDJSExport *)export context:(JSContext *)context;
 - (void)_removeExport:(MDJSExport *)export context:(JSContext *)context;
 
-- (void)_injectImportsForContext:(JSContext *)context type:(MDJSExportInjectType)type;
+- (void)_injectImportsToContext:(JSContext *)context type:(MDJSExportInjectType)type;
 - (void)_injectImport:(MDJSImport *)import context:(JSContext *)context;
 - (void)_removeImport:(MDJSImport *)import context:(JSContext *)context;
 

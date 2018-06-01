@@ -14,11 +14,11 @@
 #define MDJSImportAlloc(CLASS, PROTOCOL)            [CLASS<PROTOCOL> importWithProtocol:@protocol(PROTOCOL) type:MDJSExportInjectTypeAll]
 #define MDJSImportAlloc1(CLASS, PROTOCOL, TYPE)     [CLASS<PROTOCOL> importWithProtocol:@protocol(PROTOCOL) type:TYPE]
 
-#define MDJSImportAs(PropertyName, Selector)  \
-@optional Selector __MDJS_IMPORT_AS__##PropertyName:(id)argument; @optional Selector
+#define MDJSImportAs(FUNCTION_NAME, SELECTOR)  \
+@optional SELECTOR __MDJS_IMPORT_AS__##FUNCTION_NAME:(id)argument; @optional SELECTOR
 
-#define MDJSImportGetterAs(GetterName, Selector) \
-@optional Selector##__MDJS_IMPORT_AS__##GetterName; @optional Selector
+#define MDJSImportNoneArgumentsAs(FUNCTION_NAME, SELECTOR) \
+@optional SELECTOR##__MDJS_IMPORT_AS__##FUNCTION_NAME; @optional SELECTOR
 
 #endif
 

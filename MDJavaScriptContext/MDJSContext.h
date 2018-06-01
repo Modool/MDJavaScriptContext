@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MDJSContext : NSObject
 
 @property (nonatomic, strong, nullable, readonly) JSContext *javaScriptContext;
+@property (nonatomic, strong, nullable, readonly) JSValue *globalObject;
 
 @property (nonatomic, copy, nullable, readonly) NSArray<MDJSExport<JSExport> *> *exports;
 @property (nonatomic, copy, nullable, readonly) NSArray<MDJSImport *> *imports;
@@ -23,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)addImport:(MDJSImport *)import;
 - (BOOL)removeImport:(MDJSImport *)import;
+
+- (JSValue *)evaluateScript:(NSString *)script;
+- (JSValue *)evaluateScript:(NSString *)script withSourceURL:(NSURL *)sourceURL;
 
 @end
 

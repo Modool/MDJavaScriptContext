@@ -16,8 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak, readonly) id<UIWebViewDelegate> context;
 
-+ (instancetype)wrapperWithContext:(id<UIWebViewDelegate>)context;
-- (instancetype)initWithContext:(id<UIWebViewDelegate>)context;
+@property (nonatomic, weak, readonly) id<UIWebViewDelegate> webView;
+
++ (instancetype)wrapperWithContext:(id<UIWebViewDelegate>)context webView:(id<UIWebViewDelegate>)webView;
+- (instancetype)initWithContext:(id<UIWebViewDelegate>)context webView:(id<UIWebViewDelegate>)webView;
 
 @end
 

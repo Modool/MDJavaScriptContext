@@ -16,7 +16,7 @@ typedef struct objc_method_description objc_method_description_t;
 
 NSString * const MDJSImportPropertyNameImportPrefix = @"__MDJS_IMPORT_AS__";
 
-NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
+NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invocation) {
     NSMutableArray *values = [NSMutableArray array];
     NSUInteger count = invocation.methodSignature.numberOfArguments;
     for (int index = 2; index < count; index++) {
@@ -50,7 +50,7 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
             [invocation getArgument:&value atIndex:index];
             obj = [NSNumber numberWithLongLong:value];
         }
-        [values addObject:obj];
+        [values addObject:obj ?: [JSValue valueWithNullInContext:context]];
     }
     return values;
 }
@@ -74,6 +74,11 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 
 - (instancetype)init{
     return [self initWithProtocol:@protocol(MDJSImport) type:0];
+}
+
+- (void)dealloc{
+    _protocol = nil;
+    _javaScriptContext = nil;
 }
 
 #pragma mark - accessor
@@ -187,20 +192,24 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 }
 
 - (JSValue *)_forwardProperty:(NSString *)property invocation:(NSInvocation *)invocation isGetter:(BOOL)isGetter{
-    NSArray *arguments = MDJSImportBoxValues(invocation);
     JSValue *javaScriptObject = self.javaScriptObject;
+    JSContext *context = self.javaScriptContext;
+    
+    NSArray *arguments = MDJSImportBoxValues(context, invocation);
     
     if ([javaScriptObject isUndefined] || [javaScriptObject isNull]) return javaScriptObject;
     
     if (isGetter) return [javaScriptObject valueForProperty:property];
     else [javaScriptObject setValue:arguments.firstObject forProperty:property];
     
-    return [JSValue valueWithUndefinedInContext:javaScriptObject.context];
+    return [JSValue valueWithUndefinedInContext:context];
 }
 
 - (JSValue *)_forwardFunction:(NSString *)function invocation:(NSInvocation *)invocation{
-    NSArray *arguments = MDJSImportBoxValues(invocation);
     JSValue *javaScriptObject = self.javaScriptObject;
+    JSContext *context = self.javaScriptContext;
+    
+    NSArray *arguments = MDJSImportBoxValues(context, invocation);
 
     if ([javaScriptObject isUndefined] || [javaScriptObject isNull]) return javaScriptObject;
     
@@ -370,6 +379,10 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
     [context evaluateScript:_javaScript];
 }
 
+- (void)dealloc{
+    _javaScript = nil;
+}
+
 @end
 
 @implementation MDJSObjectImport
@@ -390,6 +403,10 @@ NSArray<NSString *> *MDJSImportBoxValues(NSInvocation *invocation) {
 
 - (instancetype)initWithProtocol:(Protocol *)protocol type:(MDJSExportInjectType)type{
     return [self initWithKeyPath:nil protocol:protocol type:type];
+}
+
+- (void)dealloc{
+    _keyPath = nil;
 }
 
 #pragma mark - accessor

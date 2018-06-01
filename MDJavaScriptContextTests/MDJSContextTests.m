@@ -78,7 +78,7 @@
     _export = [[MDJSContextTestExport alloc] initWithName:@"test" type:MDJSExportInjectTypeAfterLoading];
     [_context addExport:_export];
     
-    [_context _injectExportsForContext:_context.javaScriptContext type:MDJSExportInjectTypeAfterLoading];
+    [_context _injectExportsToContext:_context.javaScriptContext type:MDJSExportInjectTypeAfterLoading];
     
     JSValue *value = [_context.javaScriptContext evaluateScript:@"test"];
     

@@ -72,7 +72,9 @@ MDJSExportAs(method_2_arg_1_arg_2, - (NSUInteger)method2WithArg:(NSString *)arg1
     _subExport = [[MDJSExportTestsExport alloc] initWithName:@"_sub_export" type:MDJSExportInjectTypeAfterLoading];
     [_export addSubExport:_subExport];
     
-    [_export injectExportForContext:_context type:MDJSExportInjectTypeAfterLoading];
+    [_export willInjectToContext:_context javaScriptObject:_context.globalObject type:MDJSExportInjectTypeAfterLoading];
+    [_export injectToContext:_context javaScriptObject:_context.globalObject type:MDJSExportInjectTypeAfterLoading];
+    [_export didInjectToContext:_context javaScriptObject:_context.globalObject type:MDJSExportInjectTypeAfterLoading];
     
     JSValue *value = [_context evaluateScript:@"_export"];
     XCTAssertTrue([value.toObject isKindOfClass:MDJSExportTestsExport.class]);

@@ -30,6 +30,15 @@
     return [self initWithName:NSStringFromClass(self.class) type:MDJSExportInjectTypeAfterLoading];
 }
 
+- (void)dealloc{
+    [_mutableSubExports removeAllObjects];
+    
+    _name = nil;
+    _mutableSubExports = nil;
+    _javaScriptValue = nil;
+    _javaScriptContext = nil;
+}
+
 #pragma mark - accessor
 
 - (NSArray<MDJSExport<JSExport> *> *)subExports{
@@ -42,74 +51,74 @@
 
 #pragma mark - private
 
-- (void)_willInjectSubExportsToContext:(JSContext *)context type:(MDJSExportInjectType)type{
+- (void)_willInjectSubExportsToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type{
     for (MDJSExport *export in _mutableSubExports.copy) {
         if (!(type & export.injectType)) continue;
         
-        [export willInjectToContext:context type:type];
+        [export willInjectToContext:context javaScriptObject:javaScriptObject type:type];
     }
 }
 
-- (void)_injectSubExportsForType:(MDJSExportInjectType)type{
+- (void)_injectSubExportsToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type{
     for (MDJSExport *export in _mutableSubExports.copy) {
         if (!(type & export.injectType)) continue;
         
-        _javaScriptValue[export.name] = export;
+        [export injectToContext:context javaScriptObject:javaScriptObject type:type];
     }
 }
 
-- (void)_didInjectSubExportsToContext:(JSContext *)context type:(MDJSExportInjectType)type{
+- (void)_didInjectSubExportsToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type{
     for (MDJSExport *export in _mutableSubExports.copy) {
         if (!(type & export.injectType)) continue;
         
-        [export didInjectToContext:context type:type];
+        [export didInjectToContext:context javaScriptObject:javaScriptObject type:type];
     }
 }
 
-- (void)_willRemoveSubExportsFromContext:(JSContext *)context{
+- (void)_willRemoveSubExportsFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject{
     for (MDJSExport *export in _mutableSubExports.copy) {
-        [export willRemoveFromContext:context];
+        [export willRemoveFromContext:context javaScriptObject:javaScriptObject];
     }
 }
 
-- (void)_didRemoveSubExportsFromContext:(JSContext *)context{
+- (void)_didRemoveSubExportsFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject{
     for (MDJSExport *export in _mutableSubExports.copy) {
-        [export didRemoveFromContext:context];
+        [export didRemoveFromContext:context javaScriptObject:javaScriptObject];
     }
 }
 
-- (void)_removeSubExport:(MDJSExport *)export{
+- (void)_removeSubExport:(MDJSExport *)export javaScripObject:(JSValue *)javaScriptObject{
     _javaScriptValue[export.name] = nil;
 }
 
 #pragma mark - protected
 
-- (void)willInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{
-    [self _willInjectSubExportsToContext:context type:type];
-}
-
-- (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+- (void)willInjectToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type;{
     _javaScriptValue = [JSValue valueWithObject:self inContext:context];
     
-    context[self.name] = _javaScriptValue;
+    [self _willInjectSubExportsToContext:context javaScriptObject:_javaScriptValue type:type];
+}
+
+- (void)injectToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type{
+    javaScriptObject[self.name] = _javaScriptValue;
     
-    [self _injectSubExportsForType:type];
+    [self _injectSubExportsToContext:context javaScriptObject:_javaScriptValue type:type];
 }
 
-- (void)didInjectToContext:(JSContext *)context type:(MDJSExportInjectType)type;{
+- (void)didInjectToContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject type:(MDJSExportInjectType)type;{
 }
 
-- (void)willRemoveFromContext:(JSContext *)context;{
-    [self _willRemoveSubExportsFromContext:context];
+- (void)willRemoveFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject;{
+    [self _willRemoveSubExportsFromContext:context javaScriptObject:_javaScriptValue];
 }
 
-- (void)removeFromContext:(JSContext *)context{
+- (void)removeFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject{
+    javaScriptObject[self.name] = nil;
+}
+
+- (void)didRemoveFromContext:(JSContext *)context javaScriptObject:(JSValue *)javaScriptObject;{
+    [self _didRemoveSubExportsFromContext:context javaScriptObject:_javaScriptValue];
     _javaScriptValue = nil;
-    context[self.name] = nil;
-}
-
-- (void)didRemoveFromContext:(JSContext *)context;{
-    [self _didRemoveSubExportsFromContext:context];
 }
 
 #pragma mark - public
@@ -125,7 +134,7 @@
     if (![_mutableSubExports containsObject:subExport]) return NO;
     [_mutableSubExports removeObject:subExport];
     
-    [self _removeSubExport:subExport];
+    [self _removeSubExport:subExport javaScripObject:_javaScriptValue];
     return YES;
 }
 
