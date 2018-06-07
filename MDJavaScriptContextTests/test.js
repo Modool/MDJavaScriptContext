@@ -19,6 +19,11 @@ function function5(arg1, arg2){
     return "5";
 }
 
+function function6(arg1){
+    return arg1;
+}
+
+
 var property1 = 10;
 var object_import1 = {function6:function (){ return 6 }};
 

@@ -31,6 +31,9 @@
 - (void)_injectImport:(MDJSImport *)import context:(JSContext *)context;
 - (void)_removeImport:(MDJSImport *)import context:(JSContext *)context;
 
+- (JSValue *)_invokeValue:(JSValue *)value method:(NSString *)method arguments:(NSArray<JSValue *> *)arguments;
+- (JSValue *)_evaluateScript:(NSString *)script;
+
 @end
 
 @interface UIWebView (JSContext)

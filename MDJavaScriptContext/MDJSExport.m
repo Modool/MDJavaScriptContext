@@ -33,7 +33,6 @@
 - (void)dealloc{
     [_mutableSubExports removeAllObjects];
     
-    _name = nil;
     _mutableSubExports = nil;
     _javaScriptValue = nil;
     _javaScriptContext = nil;

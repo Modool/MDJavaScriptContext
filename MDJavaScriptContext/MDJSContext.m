@@ -13,6 +13,7 @@
 #import "MDJSImport+Private.h"
 
 @implementation MDJSContext
+@synthesize javaScriptContext = _javaScriptContext;
 
 - (instancetype)init{
     return [self initWithWebView:nil];
@@ -40,9 +41,22 @@
 - (JSContext *)javaScriptContext{
     if (!_javaScriptContext) {
         _javaScriptContext = _webView.javaScriptContext ?: [JSContext currentContext];
-        
+        _javaScriptContext.exceptionHandler = ^(JSContext *context, JSValue *exception) {
+            NSLog(@"context: %@, exception: %@", context, exception);
+            context.exception = nil;
+        };
     }
-    return _javaScriptContext;
+    JSValue *exception = _javaScriptContext.exception;
+    return exception ? nil : _javaScriptContext;
+}
+
+- (void)setJavaScriptContext:(JSContext *)javaScriptContext{
+    if (_javaScriptContext != javaScriptContext) {
+        _javaScriptContext = javaScriptContext;
+        _javaScriptContext.exceptionHandler = ^(JSContext *context, JSValue *exception) {
+            NSLog(@"context: %@, exception: %@", context, exception);
+        };
+    }
 }
 
 - (JSValue *)globalObject{
@@ -136,7 +150,9 @@
 }
 
 - (void)_injectImport:(MDJSImport *)import context:(JSContext *)context{
+    import.context = self;
     import.javaScriptContext = context;
+    
     [import willInjectToContext:context type:import.injectType];
     [import injectExportForContext:context type:import.injectType];
     [import didInjectToContext:context type:import.injectType];
@@ -148,6 +164,17 @@
     [import didRemoveFromContext:context];
     
     import.javaScriptContext = nil;
+    import.context = nil;
+}
+
+- (JSValue *)_invokeValue:(JSValue *)value method:(NSString *)method arguments:(NSArray<JSValue *> *)arguments;{
+    [_webView stringByEvaluatingJavaScriptFromString:@""];
+    return [value invokeMethod:method withArguments:arguments];
+}
+
+- (JSValue *)_evaluateScript:(NSString *)script;{
+    [_webView stringByEvaluatingJavaScriptFromString:@""];
+    return [_javaScriptContext evaluateScript:script];
 }
 
 #pragma mark - UIWebViewDelegate

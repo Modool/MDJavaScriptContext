@@ -8,8 +8,10 @@
 
 #import "MDJSImport.h"
 
+@class MDJSContext;
 @interface MDJSImport ()
 
+@property (nonatomic, weak) MDJSContext *context;
 @property (nonatomic, weak) JSContext *javaScriptContext;
 
 // Default is JSContext.globalObject
@@ -44,3 +46,12 @@
 - (instancetype)initWithObject:(JSValue *)object protocol:(Protocol *)protocol NS_DESIGNATED_INITIALIZER;
 
 @end
+
+@interface MDJSBlockImport : MDJSImport
+
+@property (nonatomic, copy, readonly) void (^block)(JSContext *context);
+
+- (instancetype)initWithBlock:(void (^)(JSContext *context))block type:(MDJSExportInjectType)type NS_DESIGNATED_INITIALIZER;
+
+@end
+

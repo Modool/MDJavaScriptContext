@@ -11,48 +11,59 @@
 
 #import "MDJSImport.h"
 #import "MDJSImport+Private.h"
+#import "MDJSContext+Private.h"
 
 typedef struct objc_method_description objc_method_description_t;
 
 NSString * const MDJSImportPropertyNameImportPrefix = @"__MDJS_IMPORT_AS__";
 
-NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invocation) {
+NSArray<JSValue *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invocation) {
     NSMutableArray *values = [NSMutableArray array];
     NSUInteger count = invocation.methodSignature.numberOfArguments;
     for (int index = 2; index < count; index++) {
-        id obj = nil;
+        JSValue *javaScriptValue = nil;
         const char *type = [invocation.methodSignature getArgumentTypeAtIndex:index];
         if (*type == '@') {
-            [invocation getArgument:&obj atIndex:index];
+            id object = nil;
+            [invocation getArgument:&object atIndex:index];
+            if ([object isKindOfClass:JSValue.class]) javaScriptValue = object;
+            else javaScriptValue = [JSValue valueWithObject:object inContext:context];
         } else if (*type == '{') {
             void *value = NULL;
             [invocation getArgument:&value atIndex:index];
-            obj = [NSValue value:value withObjCType:type];
+            javaScriptValue = [JSValue valueWithObject:[NSValue value:value withObjCType:type] inContext:context];
         } else if (*type == *@encode(double) || *type == *@encode(float)) {
-            double value;
+            double value = 0;
             [invocation getArgument:&value atIndex:index];
-            obj = [NSNumber numberWithDouble:value];
+            javaScriptValue = [JSValue valueWithDouble:value inContext:context];
         } else if (*type == *@encode(int) ||
                    *type == *@encode(char) ||
                    *type == *@encode(short) ||
-                   *type == *@encode(long) ||
-                   *type == *@encode(long long) ||
                    *type == *@encode(bool)) {
+            int value = 0;
+            [invocation getArgument:&value atIndex:index];
+            javaScriptValue = [JSValue valueWithInt32:value inContext:context];
+        } else if (*type == *@encode(long) ||
+                   *type == *@encode(long long)) {
             long long value = 0;
             [invocation getArgument:&value atIndex:index];
-            obj = [NSNumber numberWithLongLong:value];
+            javaScriptValue = [JSValue valueWithDouble:value inContext:context];
         } else if (*type == *@encode(unsigned int) ||
                    *type == *@encode(unsigned char) ||
-                   *type == *@encode(unsigned short) ||
-                   *type == *@encode(unsigned long) ||
+                   *type == *@encode(unsigned short) ) {
+            unsigned int value = 0;
+            [invocation getArgument:&value atIndex:index];
+            javaScriptValue = [JSValue valueWithUInt32:value inContext:context];
+        } else if (*type == *@encode(unsigned long) ||
                    *type == *@encode(unsigned long long)) {
             unsigned long long value = 0;
             [invocation getArgument:&value atIndex:index];
-            obj = [NSNumber numberWithLongLong:value];
+            javaScriptValue = [JSValue valueWithDouble:value inContext:context];
         }
-        [values addObject:obj ?: [JSValue valueWithNullInContext:context]];
+        javaScriptValue = javaScriptValue ?: [JSValue valueWithNullInContext:context];
+        [values addObject:javaScriptValue];
     }
-    return values;
+    return values.count ? values : nil;
 }
 
 @implementation MDJSImport
@@ -77,7 +88,6 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
 }
 
 - (void)dealloc{
-    _protocol = nil;
     _javaScriptContext = nil;
 }
 
@@ -97,7 +107,7 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
     }
     
     functionName = [self _functionNameWithSelector:selector required:NO];
-
+    
     if (!functionName.length) {
         functionName = [self _functionNameWithSelector:selector required:YES];
     }
@@ -158,18 +168,24 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
             *isGetter = YES;
             return @(name);
         }
+        
         const char *getter = property_copyAttributeValue(property, "G");
         if (getter && strcmp(selectorName, getter) == 0) {
             *isGetter = YES;
             return @(name);
         }
+        
         const char *setter = [self _setterName:name];
-        if (strcmp(selectorName, setter) == 0) return @(name);
+        int result = strcmp(selectorName, setter);
+        free((void *)setter);
+        
+        if (result == 0) return @(name);
         
         setter = property_copyAttributeValue(property, "S");
-        if (setter && strcmp(selectorName, setter) == 0)return @(name);
+        if (setter && strcmp(selectorName, setter) == 0) {
+            return @(name);
+        }
     }
-    
     return nil;
 }
 
@@ -181,6 +197,7 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
     NSArray<NSString *> *labels = [selectorName componentsSeparatedByString:@":"];
     for (int index = 0; index < labels.count; index++) {
         NSString *label = labels[index];
+        
         if (!label.length) continue;
         if (index) {
             NSString *firstCharacter = [[label substringToIndex:1] uppercaseString];
@@ -210,9 +227,8 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
     JSContext *context = self.javaScriptContext;
     
     NSArray *arguments = MDJSImportBoxValues(context, invocation);
-
-    if ([javaScriptObject isUndefined] || [javaScriptObject isNull]) return javaScriptObject;
     
+    if ([javaScriptObject isUndefined] || [javaScriptObject isNull]) return javaScriptObject;
     return [javaScriptObject invokeMethod:function withArguments:arguments];
 }
 
@@ -222,7 +238,9 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
     NSUInteger length = invocation.methodSignature.methodReturnLength;
     
     if (*type == '@') {
-        if (!isNull && !JSObjectIsFunction(value.context.JSGlobalContextRef, (JSObjectRef)value.JSValueRef)) {
+        JSContextRef context = value.context.JSGlobalContextRef;
+        JSObjectRef objct = JSValueToObject(context, value.JSValueRef, NULL);
+        if (!isNull && !JSObjectIsFunction(context, objct)) {
             if (value.isString) {
                 NSString *string = value.toString;
                 [invocation setReturnValue:&string];
@@ -344,6 +362,16 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
 - (void)didRemoveFromContext:(JSContext *)context;{
 }
 
+- (JSValue *)invokeValue:(JSValue *)value method:(NSString *)method arguments:(NSArray<JSValue *> *)arguments;{
+    if (_context) return [_context _invokeValue:value method:method arguments:arguments];
+    else return [value invokeMethod:method withArguments:arguments];
+}
+
+- (JSValue *)evaluateScript:(NSString *)script{
+    if (_context) return [_context _evaluateScript:script];
+    else return [_javaScriptContext evaluateScript:script];
+}
+
 @end
 
 @implementation MDJSStringImport
@@ -376,7 +404,7 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
 #pragma mark - protected
 
 - (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type{
-    [context evaluateScript:_javaScript];
+    [self evaluateScript:_javaScript];
 }
 
 - (void)dealloc{
@@ -421,3 +449,31 @@ NSArray<NSString *> *MDJSImportBoxValues(JSContext *context, NSInvocation *invoc
 }
 
 @end
+
+@implementation MDJSBlockImport
+
+- (instancetype)initWithBlock:(void (^)(JSContext *context))block type:(MDJSExportInjectType)type;{
+    NSParameterAssert(block);
+    if (self = [super initWithProtocol:@protocol(MDJSImport) type:type]) {
+        _block = [block copy];
+    }
+    return self;
+}
+
+- (instancetype)initWithProtocol:(Protocol *)protocol type:(MDJSExportInjectType)type{
+    return [self initWithBlock:nil type:type];
+}
+
+#pragma mark - protected
+
+- (void)injectExportForContext:(JSContext *)context type:(MDJSExportInjectType)type{
+    [self evaluateScript:@""];
+    _block(context);
+}
+
+- (void)dealloc{
+    _block = nil;
+}
+
+@end
+

@@ -20,6 +20,8 @@
 MDJSImportAs(function4, - (NSUInteger)function4WithArg:(NSString *)arg);
 MDJSImportAs(function5, - (NSUInteger)function5WithArg:(NSString *)arg1 arg2:(NSString *)arg2);
 
+- (id)function6:(double)value;
+
 @end
 
 @interface MDJSImportTests : XCTestCase
@@ -35,6 +37,11 @@ MDJSImportAs(function5, - (NSUInteger)function5WithArg:(NSString *)arg1 arg2:(NS
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
     _context = [[JSContext alloc] init];
+    _context.exceptionHandler = ^(JSContext *context, JSValue *exception) {
+        NSLog(@"context: %@, exception: %@", context, exception);
+        context.exception = nil;
+    };
+    
     _import = MDJSImportAlloc(MDJSImport, MDJSImportTestsImport);
     
     _import.javaScriptContext = _context;
@@ -92,6 +99,11 @@ MDJSImportAs(function5, - (NSUInteger)function5WithArg:(NSString *)arg1 arg2:(NS
 - (void)testFunction5 {
     NSUInteger value = [_import function5WithArg:@"3" arg2:@""];
     XCTAssertEqual(value, 5);
+}
+
+- (void)testFunction6 {
+    id value = [_import function6:100.22];
+    XCTAssertTrue([value doubleValue] == 100.22);
 }
 
 @end
